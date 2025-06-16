@@ -1,91 +1,123 @@
-# ☕ Afforgato Cafe - Order Management System
+# ☕ Afforgato Coffee Shop Database Management System
 
-A modern, full-featured cafe order management system built with Python Flask, MariaDB, and glassmorphism design.
+A comprehensive database management system for coffee shop operations built with MariaDB, Flask, HTML, CSS, and JavaScript.
 
-## 🌟 Features
+## 🏪 About Afforgato
 
-### 🎨 Design
-- **Glassmorphism UI** with brown/black/white color scheme
-- **Responsive design** that works on all devices
-- **Smooth animations** and interactive effects
-- **Coffee-themed emojis** throughout the interface
+**Afforgato** is a modern coffee shop management system designed to streamline operations, enhance customer experience, and provide comprehensive business analytics. The system manages customer registration, menu catalog, order processing, inventory tracking, and administrative functions through a user-friendly web interface.
 
-### 👥 User Management
-- **User Registration & Login** with secure authentication
-- **Admin Dashboard** for management
-- **Profile management** with order history
-- **Role-based access control**
+*Owned by Tejashwini, Srujana* | 📍 Bengaluru, Karnataka, India
 
-### 🛒 Order System
-- **Dynamic menu** with categories and items
-- **Shopping cart** with quantity controls
-- **Checkout process** with multiple payment options
-- **Order tracking** with real-time status updates
-- **Order history** and reordering functionality
+## ✨ Features
 
-### 💳 Payment System
-- **Multiple payment methods** (Credit Card, PayPal, Apple Pay, Cash)
-- **Secure payment processing** simulation
-- **Payment status tracking**
-- **Receipt generation**
+### 👥 Customer Features
+- **User Registration & Authentication** - Secure account creation and login
+- **Menu Browsing** - Browse coffee items by categories with detailed descriptions
+- **Shopping Cart** - Add items to cart with quantity management
+- **Order Placement** - Seamless checkout and order processing
+- **Order Tracking** - Real-time order status updates
+- **Profile Management** - Manage personal information and addresses
 
-### 👨‍💼 Admin Features
-- **Dashboard** with analytics and statistics
-- **Order management** with status updates
-- **User management**
-- **Menu item management**
-- **Real-time order monitoring**
+### 🔧 Admin Features
+- **Dashboard Analytics** - Comprehensive business insights and statistics
+- **Menu Management** - Add, update, and remove menu items
+- **Category Management** - Organize menu items by categories
+- **Order Management** - Track and update order status
+- **Inventory Control** - Real-time stock management and alerts
+- **User Management** - Manage customer accounts and staff
+- **Audit Logs** - Complete activity tracking and reporting
 
-## 🚀 Quick Start
+### 🎨 Design Features
+- **Glassmorphism UI** - Modern design with brown/black/white color scheme
+- **Coffee Bean Background** - Attractive coffee-themed aesthetics
+- **Responsive Design** - Desktop-first approach with mobile compatibility
+- **Interactive Elements** - Smooth animations and user feedback
+
+## 🛠️ Technology Stack
+
+### Backend
+- **Database**: MariaDB (Enhanced MySQL compatibility)
+- **Framework**: Flask (Python web framework)
+- **ORM**: SQLAlchemy
+- **Authentication**: Flask-Login with password hashing
+
+### Frontend
+- **Markup**: HTML5 with semantic elements
+- **Styling**: CSS3 with Flexbox and Grid
+- **Scripting**: JavaScript (ES6+)
+- **Design**: Custom glassmorphism theme
+
+### Development Tools
+- **IDE**: Visual Studio Code
+- **Version Control**: Git
+- **Database Tools**: MariaDB Workbench
+
+## 📊 Database Schema
+
+The system uses a normalized database design (3NF) with 11 core tables:
+
+- **users** - Customer and admin authentication
+- **user_profiles** - Extended user information
+- **addresses** - Multiple addresses per user
+- **categories** - Menu item categories
+- **menu_items** - Product catalog with inventory
+- **orders** - Order management and tracking
+- **order_items** - Individual order line items
+- **cart** - Shopping cart functionality
+- **audit_log** - System activity tracking
+- **inventory_log** - Stock movement tracking
+- **order_status_history** - Order status changes
+
+## 🚀 Installation & Setup
 
 ### Prerequisites
 - Python 3.8+
-- MariaDB 10.4+
-- pip (Python package manager)
+- MariaDB 10.5+
+- Git
 
-### Installation
+### Installation Steps
 
 1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd Afforgato
-   ```
+```bash
+git clone https://github.com/Tejashwini2406/Afforgato.git
+cd Afforgato
+```
 
-2. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+2. **Create virtual environment**
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-3. **Setup MariaDB**
-   - Install MariaDB from [https://mariadb.org/download/](https://mariadb.org/download/)
-   - Start MariaDB service
-   - Ensure root user access (default: no password)
+3. **Install dependencies**
+```bash
+pip install -r requirements.txt
+```
 
-4. **Run setup script**
-   ```bash
-   python setup.py
-   ```
+4. **Setup MariaDB database**
+```bash
+# Create database
+mysql -u root -p
+CREATE DATABASE afforgato_cafe;
+exit
 
-5. **Start the application**
-   ```bash
-   python app.py
-   ```
+# Import schema
+mysql -u root -p afforgato_cafe < database.sql
+```
 
-6. **Access the application**
-   - Open your browser to `http://localhost:5000`
-   - Use demo accounts to explore features
+5. **Configure environment variables**
+```bash
+# Create .env file
+cp .env.example .env
+# Edit .env with your database credentials
+```
 
-## 🔐 Demo Accounts
+6. **Run the application**
+```bash
+flask run
+```
 
-### Admin Account
-- **Username:** `admin`
-- **Password:** `admin123`
-- **Access:** Full admin dashboard and management features
-
-### User Account
-- **Username:** `demo`
-- **Password:** `demo123`
-- **Access:** Customer features (ordering, cart, profile)
+Visit `http://localhost:5000` to access the application.
 
 ## 📁 Project Structure
 
@@ -97,163 +129,59 @@ Afforgato/
 ├── setup.py               # Setup script
 ├── requirements.txt       # Python dependencies
 ├── database.sql           # Database schema and sample data
+├── PROJECT_ABSTRACT.txt   # Complete project documentation
 ├── templates/             # HTML templates
-│   ├── base.html         # Base template with glassmorphism
-│   ├── index.html        # Home page
-│   ├── login.html        # Login page
-│   ├── register.html     # Registration page
-│   ├── menu.html         # Menu display
-│   ├── cart.html         # Shopping cart
-│   ├── checkout.html     # Checkout process
-│   ├── payment.html      # Payment processing
-│   ├── orders.html       # Order history
-│   └── admin_dashboard.html # Admin dashboard
-├── static/               # Static files
-│   ├── css/
-│   │   └── style.css     # Glassmorphism styles
-│   ├── js/
-│   │   └── main.js       # JavaScript functionality
-│   ├── images/           # Image assets
-│   └── uploads/          # File uploads
+├── static/               # Static files (CSS, JS, images)
 └── README.md             # This file
 ```
 
-## 🎨 Design Features
+## 🧪 Testing
 
-### Glassmorphism Effects
-- **Backdrop blur** for glass-like appearance
-- **Transparent backgrounds** with subtle borders
-- **Layered depth** with shadows and highlights
-- **Smooth transitions** and hover effects
+The system has been thoroughly tested with:
+- **Component Testing** - Individual module testing
+- **Integration Testing** - Module interaction testing
+- **System Testing** - End-to-end functionality testing
+- **User Acceptance Testing** - Real-world scenario testing
 
-### Color Scheme
-- **Primary Brown:** `#8B4513` (Saddle Brown)
-- **Secondary Brown:** `#A0522D` (Sienna)
-- **Black Primary:** `#1a1a1a` (Rich Black)
-- **White Primary:** `#ffffff` (Pure White)
+## 📈 Business Impact
 
-### Interactive Elements
-- **Animated buttons** with hover effects
-- **Floating animations** for background elements
-- **Smooth page transitions**
-- **Real-time form validation**
-
-## 🗄️ Database Schema
-
-### Tables
-- **users** - User accounts and profiles
-- **categories** - Menu categories
-- **menu_items** - Food and drink items
-- **orders** - Customer orders
-- **order_items** - Individual order items
-- **cart** - Shopping cart items
-
-### Sample Data
-- Pre-loaded menu categories (Hot Coffee, Cold Coffee, Tea, Pastries, etc.)
-- Sample menu items with prices and descriptions
-- Demo user accounts for testing
-
-## 🔧 Configuration
-
-### Environment Variables
-Create a `.env` file with:
-```env
-SECRET_KEY=your-secret-key
-MYSQL_HOST=localhost
-MYSQL_USER=root
-MYSQL_PASSWORD=your-password
-MYSQL_DB=afforgato_cafe
-```
-
-### Database Configuration
-- **Host:** localhost (default)
-- **Database:** afforgato_cafe
-- **User:** root (default)
-- **Password:** empty (default)
-
-## 🚀 Deployment
-
-### Development
-```bash
-python app.py
-```
-Access at `http://localhost:5000`
-
-### Production
-1. Set `FLASK_ENV=production` in `.env`
-2. Use a production WSGI server (e.g., Gunicorn)
-3. Configure reverse proxy (e.g., Nginx)
-4. Set up SSL certificates
-5. Use production database credentials
-
-## 🛠️ Customization
-
-### Adding Menu Items
-1. Access admin dashboard
-2. Navigate to menu management
-3. Add categories and items
-4. Set prices and availability
-
-### Styling Changes
-- Edit `static/css/style.css` for design changes
-- Modify color variables in CSS root
-- Update glassmorphism effects
-
-### Adding Features
-- Extend models in `models.py`
-- Add routes in `app.py`
-- Create templates in `templates/`
-- Add JavaScript in `static/js/main.js`
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-**Database Connection Error**
-- Ensure MariaDB is running
-- Check credentials in `.env` file
-- Verify database exists
-
-**Import Errors**
-- Run `pip install -r requirements.txt`
-- Check Python version (3.8+ required)
-
-**Port Already in Use**
-- Change port in `app.py`: `app.run(port=5001)`
-- Or kill process using port 5000
-
-**Static Files Not Loading**
-- Check file paths in templates
-- Ensure static folder structure is correct
-- Clear browser cache
-
-## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
+- **Operational Efficiency** - Streamlined order processing and inventory management
+- **Customer Experience** - User-friendly interface and real-time order tracking
+- **Data Integrity** - Normalized database design with comprehensive audit trails
+- **Scalability** - Designed to handle growing business requirements
+- **Analytics** - Business insights for informed decision making
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📞 Support
+## 📄 License
 
-For support and questions:
-- Create an issue on GitHub
-- Check the troubleshooting section
-- Review the documentation
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🎉 Acknowledgments
+## 👥 Authors
 
-- **Flask** - Web framework
-- **Bootstrap** - UI components
-- **Font Awesome** - Icons
-- **Google Fonts** - Typography
-- **MariaDB** - Database system
+- **Tejashwini** - *Project Lead & Database Design*
+- **Srujana** - *Frontend Development & UI/UX*
+
+## 🙏 Acknowledgments
+
+- Flask community for excellent documentation
+- MariaDB team for robust database engine
+- Coffee shop industry for inspiration
+- BMSIT College for academic support
+
+## 📞 Contact
+
+For questions or support, please contact:
+- 📧 Email: contact@afforgato.com
+- 🌐 Website: [Coming Soon]
+- 📍 Location: Bengaluru, Karnataka, India
 
 ---
 
-**Enjoy your coffee and happy coding! ☕✨**
+*Made with ☕ and ❤️ in Bengaluru*
