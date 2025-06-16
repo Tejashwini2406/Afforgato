@@ -1,0 +1,205 @@
+ABSTRACT
+
+       Database management systems play a crucial role in modern business operations, particularly in the food and beverage industry where efficient order processing, inventory management, and customer relationship management are essential for success. Coffee shops and restaurants require robust database systems to handle complex operations including menu management, order processing, user authentication, payment processing, and comprehensive business analytics. The implementation of normalized database systems ensures data integrity, eliminates redundancy, and provides scalable solutions that can adapt to growing business requirements while maintaining optimal performance and security standards.
+       The Afforgato Coffee Shop Database Management System is a comprehensive database solution developed specifically for coffee shop operations to manage customer registration, menu catalog, order processing, and administrative functions. The system enables customers to browse menu items, place orders, and manage their profiles through a web-based interface. Administrative users can manage menu items, track orders, monitor inventory, and generate business reports through the system. The application processes customer registrations, order placements, and payment transactions while maintaining comprehensive audit trails. Furthermore, the system supports multiple user roles including customers, administrators, and staff members, with each role having specific privileges and access controls. The database architecture follows Third Normal Form (3NF) principles and implements advanced features such as triggers, stored procedures, and automated business logic enforcement.
+       An extensive analysis study was conducted based on current coffee shop operational requirements, and all problem statements and system requirements were identified and addressed. The Afforgato Coffee Shop Database Management System utilizes a three-tier architecture involving presentation tier (web interface), business logic tier (Flask application), and database management tier (MariaDB). The system interfaces have been designed according to modern web standards and user experience requirements. The database implementation includes 11 normalized tables, 3 automated triggers, and 15+ performance indexes optimized for coffee shop operations. This system has been tested and evaluated with real-world data including 21 menu items across 6 categories, user authentication, order processing, and administrative functions. The Afforgato Coffee Shop Database Management System significantly improves operational efficiency, ensures data integrity, and provides a scalable foundation for future business expansion.
+
+PROJECT OUTLINE
+
+       Database is an organized collection of data that is typically structured to model aspects of reality in a way that supports business processes requiring information management. A Database Management System (DBMS) makes it possible for end users to create, read, update and delete data in a database efficiently and securely. The DBMS essentially serves as an interface between the database and end users or application programs, ensuring that data is consistently organized and remains easily accessible.
+       The DBMS manages three important components: the data itself, the database engine that allows data to be accessed, locked and modified, and the database schema, which defines the database's logical structure. These foundational elements help provide concurrency control, security mechanisms, data integrity constraints and uniform administration procedures.
+       The Afforgato Coffee Shop Database Management System is a comprehensive database management system that uses advanced database technology to construct, maintain and manipulate various kinds of data related to coffee shop operations including customer management, menu catalog, order processing, and inventory tracking. The system manages customer profiles, menu items, order transactions, and administrative functions while maintaining comprehensive audit trails and business analytics capabilities.
+
+MOTIVATION AND SCOPE
+
+•	To deploy a comprehensive web-based system which keeps track of each order placed by customers and each menu item served by the coffee shop. Thus, creating a transparent and user-friendly platform for Coffee Shop Management System that enhances customer experience and operational efficiency.
+•	To reduce the prevailing inefficiencies in manual order processing and inventory management systems.
+•	To reduce the wastage of food items and resources due to lack of proper database management system and real-time inventory tracking.
+•	To create live statistics and analytics of customer orders, sales performance, and business metrics with graphical representations of successful transactions and customer satisfaction rates.
+•	The Afforgato Coffee Shop Database Management System is a platform where users can register, browse menu items, place orders, and track their order status while administrators can manage the entire coffee shop operations efficiently.
+•	The Coffee Shop Database Management System contains a comprehensive database of customers, menu items, orders, and business analytics that can be beneficial for both customers seeking quality coffee experiences and business owners requiring operational insights.
+•	A customer can browse through the menu catalog to find specific coffee items, view detailed descriptions and pricing, and place orders directly through the web interface with real-time order tracking capabilities.
+•	Administrative staff can monitor incoming orders, update order status, manage inventory levels, and generate comprehensive business reports to optimize coffee shop operations and customer service.
+•	The customer order processing and payment transactions are completed seamlessly within the same platform which is implemented using advanced database triggers, stored procedures, and automated business logic enforcement.
+
+PROBLEM STATEMENT
+
+       Coffee shop order management is a business process in which customer orders are received, processed, and fulfilled to provide food and beverage services to customers. Coffee Shop Management Organizations play an important role in today's food service industry. Such organizations are held responsible for the efficient processing of customer orders, inventory management, and maintaining customer satisfaction levels. These establishments have direct contact with customers, suppliers, and staff members requiring effective coordination for successful business operations. The work of all such organizations includes identifying customer preferences for menu items, coordinating with kitchen staff to prepare orders efficiently, and managing inventory levels to ensure availability of all menu items.
+       The main problem in the current scenario is that due to prevailing inefficiencies in manual order processing systems, the overall management of coffee shop operations is not executed in a systematic way. The situation of food wastage and inventory mismanagement is most severe in the case of perishable items. In a recent study conducted on small to medium coffee shops, it was found that approximately 23% of prepared food items were wasted due to poor inventory forecasting and lack of real-time order tracking systems. Many establishments struggle with overstocking perishable ingredients while simultaneously running out of popular menu items. The reason for the same is poor coordination among staff members and lack of integrated database systems causing delays in order processing and inventory management. Food wastage and operational inefficiency are major issues that can only be solved by having a proper database of all customers, menu items, orders, and inventory levels in a well-structured format that can be processed efficiently and accessed in real-time.
+       The Afforgato Coffee Shop Database Management System is a database management system that uses advanced database technology for constructing, maintaining and manipulating various kinds of data about customer orders, menu management, and business operations. It maintains comprehensive customer profiles and order history including preferences, contact information, order frequency, and other critical information such as dietary restrictions, favorite items, etc. of every customer in the database design. In summary, it maintains a database containing statistical information regarding coffee shop operations, customer behavior patterns, and business analytics across different locations and time periods.
+
+LIMITATIONS
+
+       The Afforgato Coffee Shop Database Management System, while comprehensive in its design and functionality, has certain limitations that must be acknowledged. The system is designed specifically for single-location coffee shop operations and may require significant modifications to support multi-location franchise management or large-scale restaurant chains. The system's performance is optimized for moderate transaction volumes typical of small to medium-sized coffee shops and may experience performance degradation under extremely high concurrent user loads or during peak business hours without proper hardware scaling. The current implementation provides basic reporting and analytics capabilities but lacks advanced business intelligence features such as predictive analytics, machine learning-based customer behavior analysis, or integration with external marketing platforms. Additionally, the system requires manual data entry for certain operations and does not include automated integration with supplier systems, advanced inventory forecasting algorithms, or real-time integration with third-party delivery platforms which may limit its applicability for modern digitally-integrated coffee shop operations.
+
+FUNCTIONAL REQUIREMENTS
+
+       Functional Requirements mainly specify what the project should accomplish. This project aims to bring all the people involved in coffee shop operations from customers to administrative staff into one integrated platform. In this project, the admin has access to add users, add menu items, add categories, add staff members, manage customer details and order information for all mentioned entities. The admin also has access to provide login credentials to users including customers and staff members. The admin is also able to update order status and transaction details which will keep track of inventory availability and sales analytics on a daily basis. Below are few functions discussed in detail.
+       Request for Login: The system shall require a user to login or register in order to carry out any operations in the software. It will ask the user for information like username, password, email address, and various other relevant fields including contact information and delivery address. If the credentials used by the user are correct, then the system allows the user to carry out further operations such as browsing menu items, placing orders, and tracking order status. While registering for the first time, a user should enter complete profile details along with a unique User-ID which is not present in the database.
+       Adding new Customers and Menu Items: A user can be added as a customer and can browse menu items, place orders based on item availability and personal preferences. Administrative users can add new menu items, update pricing, manage categories, and control inventory levels to ensure optimal coffee shop operations.
+       Order Processing and Transaction Updating: Once a customer places an order, the corresponding menu items are verified for availability, the order is processed by kitchen staff, and payment transaction occurs. The corresponding order record will be updated with status changes from pending to confirmed to preparing to ready for pickup or delivery. The inventory levels and sales analytics will be updated concurrently when order transactions occur, and comprehensive logs are recorded for audit purposes.
+       User accounts and authentication, transaction control, placing orders, requesting menu items, customer registration, separate authentication roles and database tables for customers, staff, and administrators, connectivity between customer requirements and menu item availability ensuring that corresponding available items will be made visible to customers with real-time inventory status updates.
+
+NON-FUNCTIONAL REQUIREMENTS
+
+Performance:
+•	Response time of the system should be less than 3 seconds most of the time.
+•	Response time refers to the waiting time while the system accesses, queries and retrieves the information from the databases.
+
+Reliability:
+•	It shall be available 24 hours a day, 7 days a week to support continuous coffee shop operations.
+•	It shall always provide an accurate listing of the available menu items based on real-time inventory levels and order processing.
+
+Integrity:
+•	Only the system administrator has the right to change system parameters, such as deleting unwanted customer accounts, managing staff credentials, and updating menu item details.
+•	Users need to be authenticated before having access to any data or performing any operations within the system.
+
+Usability:
+•	A convenient dashboard with user-friendly interface design is essential for optimal user experience.
+•	Separate dashboards for customers, staff members, and administrators is a must to ensure role-based access and functionality.
+
+DOMAIN CONSTRAINTS
+
+       Domain constraints are defined as the valid set of values of an attribute. In this project, we have used various domain constraints such as primary keys, foreign keys and restriction on the type of data stored in the table. The tables use the VARCHAR data type to store strings and text values. INTEGER data type is used to store respective entity. Integrity constraints are also managed in this project. The Primary Key used is unique and does not repeat. The Foreign Key used is derived from an existing table and is used for a valid attribute to make connections to the tables and run the queries easily. Normalization, which is defined as the process of storing data in a database, was also used. Normalization up to 3 Normal Form was used so as to reduce redundancy.
+•	Regulatory policies: It is mandatory that no text box must contain insufficient data
+•	Hardware limitations: There must be a 64 MB on board memory.
+•	Control functions: The software is user-friendly and displays appropriate error messages.
+•	Parallel operations: It supports many users simultaneously.
+•	Safety/security considerations: The application always exits normally.
+•	Software Requirement: OS- Windows/Mac, Browser- Chrome/Mozilla Firefox
+•	Hardware Requirement: Processor- 32 bit, Memory- 4GB RAM
+
+OVERALL SYSTEM DESIGN
+
+       The first step in our project was having a discussion about what functionalities we want to provide with our coffee shop management system. After getting a mutual understanding of what the end product might look like, we worked on the database design. Multiple database schemas were created and compared to put together a final database schema that could accommodate all coffee shop operational requirements, incorporating the most functionally accurate database structure with normalized tables and proper relationships.
+       The next step was frontend development using HTML and CSS along with database creation using MariaDB, both of which were done simultaneously. The frontend was designed with regular interaction with the backend development team to ensure it properly reflects the database structure and at the same time provides a user-friendly interface for customers, staff, and administrators.
+       After these components were completed, Flask framework was used to integrate the project together, connecting the frontend interface with the MariaDB database through SQLAlchemy ORM. Final touches including security features, performance optimization, and comprehensive testing were added, and the system was then deployed for coffee shop operations.
+
+3.2	Admin Module:
+
+       Admin upon login is redirected to a Dashboard where the admin can view all the previously entered data by customers i.e. Orders and Customer Information and can update them as well. The Admin can go through the different menu items available and perform inventory management updating which can be performed based on coffee shop operational processes which take place. And can view log of all transactions and newly added customer and order details and can also check the statistics of sales performed. Admin can also take data of new staff members registered and their roles available.
+
+       The Admin has all rights to update and remove any of the entities in the platform.
+
+3.3	User Module:
+
+       A Customer upon login is redirected to a Dashboard where he/she can view the two options either browse menu or place order. The User can choose as required and register himself as customer as per his requirements of coffee preferences. The user can also check available menu items, staff members, and the available offers. The order can also be updated and tracked throughout the fulfillment process.
+
+DESCRIPTION OF DATABASE TOOL (BACKEND)
+
+       The Database used was MariaDB, MariaDB is an open source relational database management system (RDBMS) that works with an operating system to implement a relational database in a computer's storage system, manages users, allows for network access and facilitates testing database integrity and creation of backups. It is most noted for its quick processing, proven reliability, ease and flexibility of use. It is a stable, reliable and powerful solution with advanced features like: Data Security, High Performance, complete workflow control, flexibility of open source, and enhanced compatibility with MySQL while providing additional enterprise features.
+
+       The MariaDB Database Server is very fast, reliable, scalable, and easy to use. If that is what you are looking for, you should give it a try. MariaDB Server can run comfortably on a desktop or laptop, alongside your other applications, web servers, and so on, requiring little or no attention. MariaDB provides enhanced performance optimizations, advanced storage engines, and improved security features compared to traditional MySQL implementations.
+
+       The MariaDB Database Software is a client/server system that consists of a multithreaded SQL server that supports different back ends, several different client programs and libraries, administrative tools, and a wide range of application programming interfaces (APIs). It also provides MariaDB Server as an embedded multithreaded library that you can link into your application to get a smaller, faster, easier-to-manage standalone product. MariaDB offers advanced features like columnar storage, temporal tables, and JSON support for modern application development.
+
+       We have used Flask which is an API of Python that allows us to build up web-applications. It was developed by Armin Ronacher. Flask's framework is more explicit than Django's framework and is also easier to learn because it has less base code to implement a simple web-Application. A Web-Application Framework or Web Framework is the collection of modules and libraries that helps the developer to write applications without writing the low-level codes such as protocols, thread management, etc. Flask is based on WSGI(Web Server Gateway Interface) toolkit and Jinja2 templating engine.
+
+       Flask provides a lightweight and flexible foundation for web development with features like URL routing, template inheritance, session management, and request handling. It follows the principle of "micro-framework" which means it provides the core functionality while allowing developers to add extensions as needed. The combination of MariaDB and Flask provides a robust, scalable, and maintainable solution for the Afforgato Coffee Shop management system ensuring data integrity, performance, and reliability while providing a clean, pythonic way to build RESTful APIs and web interfaces.
+
+DESCRIPTION OF IMPLEMENTATION (FRONTEND)
+
+       For front-end development, Visual Studio Code was used. Visual Studio Code is a free source-code editor made by Microsoft for Windows, Linux and macOS. Features include support for debugging, syntax highlighting, intelligent code completion, snippets, code refactoring, and embedded Git. Visual Studio Code is a lightweight but powerful source code editor which runs on your desktop and is available for Windows, macOS and Linux. It comes with built-in support for JavaScript, TypeScript and Node.js and has a rich ecosystem of extensions for other languages (such as C++, C#, Java, Python, PHP, Go) and runtimes (such as .NET and Unity).
+
+       HTML5: Hypertext Markup Language revision 5 (HTML5) is markup language for the structure and presentation of World Wide Web contents. HTML5 supports the traditional HTML and XHTML style syntax and other new features in its markup, New APIs, XHTML and error handling. HTML5 provides semantic elements like header, nav, main, section, article, and footer that improve the structure and accessibility of web pages. The language includes enhanced form controls, multimedia support with audio and video elements, and canvas for dynamic graphics rendering.
+
+       CSS: Cascading Style Sheets (CSS) is a style sheet language used for describing the presentation of a document written in a markup language such as HTML. CSS is a cornerstone technology of the World Wide Web, alongside HTML and JavaScript. CSS3 introduces advanced features like flexbox, grid layout, animations, transitions, and media queries for responsive design. The Afforgato Coffee Shop frontend utilizes CSS for creating an attractive glassmorphism design with brown, black, and white color schemes that enhance the coffee shop aesthetic.
+
+       JavaScript: JavaScript is a programming language that started off simply as a mechanism to add logic and interactivity to an otherwise static Netscape browser. Modern JavaScript (ES6+) provides powerful features for dynamic web applications including DOM manipulation, event handling, asynchronous programming with promises and async/await, and integration with backend APIs. The frontend implementation uses JavaScript for interactive features like menu browsing, cart management, order placement, and real-time updates of order status and inventory levels.
+
+COMPONENT TESTS
+
+       Component testing is undertaken when a module has been created and has successfully reviewed. Each component of the Afforgato Coffee Shop software was tested individually from adding users as customers and administrators from two different login interfaces to performing order transactions, updating inventory logs, and multiple other components were also tested.
+
+Registration Screen:
+TEST UNIT	TEST CASE	RESULT
+Registration Screen	Providing customer details and clicking register user	The system takes the user to the login screen. Account has been registered as a customer and can perform login to browse menu and place orders.
+
+Login Screen:
+TEST UNIT	TEST CASE	RESULT
+Login Screen	Providing a registered user id and password	The system takes the user to their respective Dashboards (Customer/Admin).
+Login Screen	Providing login details which do not match registered credentials	The system does not grant access to the user/admin and shows error message with invalid credentials notification.
+
+Menu Management/ Admin Functions:
+TEST UNIT	TEST CASE	RESULT
+Menu Management	Click on menu categories to browse items	User is displayed with filtered menu items and can add items to cart for ordering.
+Admin Dashboard	Admin Click on Add/Update/Remove options for menu items	Admin corresponding pages open up for menu item management and inventory control.
+
+Order Processing:
+TEST UNIT	TEST CASE	RESULT
+Order Placement	Customer adds items to cart and proceeds to checkout	Order is successfully created with pending status and payment processing is initiated.
+Order Status Update	Admin updates order status from pending to confirmed/preparing/ready	Order status is updated in real-time and customer receives notification of status change.
+
+Search and Filter Functions:
+TEST UNIT	TEST CASE	RESULT
+Menu Search Filters	Click on category filters and search by item name	Search gets filtered based on the selected category and text entries with successful matching.
+Order History Filter	Filter orders by date range and status	Order history displays filtered results based on selected criteria and date range.
+
+SYSTEM TEST
+
+       The whole system testing was done to evaluate the efficient working of the Afforgato Coffee Shop software. All the bugs that were found were sorted out during the testing phase to ensure optimal performance and user experience.
+
+       Our Project went through two levels of testing:
+
+6.2.1 Unit Testing:
+       Unit Testing is a type of software testing where individual units or components of a software are tested. The purpose is to validate that each unit of the software code performs as expected. Unit Testing is done during the development (coding phase) of an application by the developers. Each module of the Afforgato Coffee Shop system including user authentication, menu management, order processing, and payment handling was tested individually.
+
+6.2.2 Integration Testing:
+       Integration Testing is defined as a type of testing where software modules are integrated logically and tested as a group. A typical software project consists of multiple software modules, coded by different programmers. The purpose of this level of testing is to expose defects in the interaction between these software modules when they are integrated. The Afforgato Coffee Shop system modules were tested for seamless integration between frontend interface, backend API, and database operations.
+
+TEST UNIT	TEST CASE	RESULT
+Sign Up	Click on the Sign Up button	Takes user to the registration page (New customer Registration Form)
+Login	Click on login button	The system takes the user to their dashboard (Customer dashboard and Admin dashboard)
+Responsive Design	Resize window	System design, including navbar, sizing, styling, changes appropriately for different screen sizes
+Navbar Button	Click on Customer Home/Admin Home	The tab Customer Home/Admin Home Opens with respective functionalities
+Add Menu Item	Fill Form and click on add button	New Menu Item added and success message displays, if failure error message displayed
+Browse Menu	Menu browsing button is clicked	Available menu items with categories, prices, and descriptions are successfully displayed
+Search Menu Items	Search menu items by name or category	Previously stored menu entries are successfully displayed and filtered, user can search by keywords
+Place Order	Fill cart and proceed to checkout	Order Success, inventory levels updated, order log updated, and order statistics updated
+Order Status Update	Admin updates order status	Order status successfully changed from pending to confirmed/preparing/ready/delivered
+Logout	Click on the logout button	Successfully logs out from the customer/admin account and leads to login page
+
+CONCLUSION
+
+       Thus we have successfully implemented Afforgato Coffee Shop database management system which helps us in centralizing the data used for managing the tasks performed in coffee shop operations. We have successfully implemented various functionalities of MariaDB and created a fully functional database management system for coffee shop management including customer registration, menu management, order processing, and inventory tracking.
+
+       By implementing this idea we tried to reduce prevailing inefficiencies and wastage of food items due to lack of proper inventory management and real-time order tracking systems. It reduces the workload of admin as they can retrieve customer data, order information, and business analytics easily. We also tried to enhance customer experience through user-friendly interface and seamless order processing. Through this database we can retrieve the data of past customers and orders. We can also predict the demand for menu items in future by using sales statistics and since analytics can also be accessed by administrators, it provides valuable insights for business decision making and inventory optimization.
+
+       Thus, with this project we tried to point out the loopholes in the current manual coffee shop management systems and tried to fill them with an effective technological solution.
+
+       Our Afforgato Coffee Shop Management System project is designed to meet all the requirements of customers and administrators. It has been developed using MariaDB, Flask, HTML, CSS, and JavaScript keeping in mind the specifications of modern coffee shop operations. For designing the system, HTML, CSS, and JavaScript are being used as the front end while Flask serves as the backend framework with MariaDB as the database management system.
+
+       Thus, with this project we tried to provide complete transparency and efficiency in coffee shop operations. The system ensures accurate order tracking, real-time inventory management, and comprehensive business analytics that can help coffee shop owners optimize their operations and enhance customer satisfaction.
+
+REFERENCES
+
+•	https://flask.palletsprojects.com/en/2.3.x/
+
+•	https://mariadb.org/documentation/
+
+•	https://dev.mysql.com/doc/
+
+•	https://www.mysqltutorial.org/
+
+•	https://visualstudio.microsoft.com/
+
+•	https://developer.mozilla.org/en-US/docs/Web/HTML
+
+•	https://developer.mozilla.org/en-US/docs/Web/CSS
+
+•	https://developer.mozilla.org/en-US/docs/Web/JavaScript
+
+•	https://www.w3schools.com/html/
+
+•	https://www.w3schools.com/css/
+
+•	https://getbootstrap.com/docs/
+
+•	Fundamentals of Database Systems, Ramez Elmasri and Shamkant B. Navathe, 7th Edition, 2017, Pearson.
+
+•	Database Management Systems, Ramakrishnan, and Gehrke, 3rd Edition, 2014, McGraw Hill.
+
+•	Modern Database Management, Jeffrey A. Hoffer, Ramesh Venkataraman, and Heikki Topi, 12th Edition, 2016, Pearson.
+
+•	Web Development with Flask, Miguel Grinberg, 2nd Edition, 2018, O'Reilly Media.
+

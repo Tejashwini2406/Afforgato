@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}Menu - Afforgato Cafe ☕{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="mb-3 fade-in">Our Delicious Menu 📋</h1>
+            <p class="lead fade-in">Discover our carefully crafted selection of coffee, food, and treats!</p>
+        </div>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card p-3 fade-in">
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a href="{{ url_for('menu') }}" 
+                       class="glass-btn-secondary btn-sm {{ 'active' if not selected_category else '' }}">
+                        🍽️ All Items
+                    </a>
+                    {% for category in categories %}
+                        <a href="{{ url_for('menu', category=category.id) }}" 
+                           class="glass-btn-secondary btn-sm {{ 'active' if selected_category and selected_category.id == category.id else '' }}">
+                            {{ category.emoji or '📂' }} {{ category.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Selected Category Info -->
+    {% if selected_category %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card p-4 text-center fade-in">
+                <h3>{{ selected_category.emoji or '📂' }} {{ selected_category.name }}</h3>
+                {% if selected_category.description %}
+                    <p class="mb-0">{{ selected_category.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Menu Items -->
+    {% if menu_items %}
+    <div class="row g-4">
+        {% for item in menu_items %}
+        <div class="col-lg-4 col-md-6">
+            <div class="glass-card menu-item-card h-100 fade-in" data-item-id="{{ item.id }}">
+                <div class="menu-item-image">
+                    {% if item.name == 'Espresso' %}
+                        <img src="{{ url_for('static', filename='images/menu/espresso.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">☕</div>
+                    {% elif item.name == 'Cappuccino' %}
+                        <img src="{{ url_for('static', filename='images/menu/cappuccino.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">☕</div>
+                    {% elif item.name == 'Latte' %}
+                        <img src="{{ url_for('static', filename='images/menu/latte.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">☕</div>
+                    {% elif item.name == 'Americano' %}
+                        <img src="{{ url_for('static', filename='images/menu/americano.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">☕</div>
+                    {% elif item.name == 'Mocha' %}
+                        <img src="{{ url_for('static', filename='images/menu/mocha.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">☕</div>
+                    {% elif item.name == 'Macchiato' %}
+                        <img src="{{ url_for('static', filename='images/menu/macchiato.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">☕</div>
+                    {% elif item.name == 'Frappuccino' %}
+                        <img src="{{ url_for('static', filename='images/menu/frappuccino.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🥤</div>
+                    {% elif item.name == 'Iced Latte' %}
+                        <img src="{{ url_for('static', filename='images/menu/iced-latte.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🧊</div>
+                    {% elif item.name == 'Cold Brew' %}
+                        <img src="{{ url_for('static', filename='images/menu/cold-brew.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🧊</div>
+                    {% elif item.name == 'Croissant' %}
+                        <img src="{{ url_for('static', filename='images/menu/croissant.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🥐</div>
+                    {% elif item.name == 'Muffin' %}
+                        <img src="{{ url_for('static', filename='images/menu/muffin.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🧁</div>
+                    {% elif item.name == 'Bagel' %}
+                        <img src="{{ url_for('static', filename='images/menu/bagel.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🥯</div>
+                    {% elif item.name == 'Danish' %}
+                        <img src="{{ url_for('static', filename='images/menu/danish.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🥐</div>
+                    {% elif item.name == 'Scone' %}
+                        <img src="{{ url_for('static', filename='images/menu/scone.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🧁</div>
+                    {% elif item.name == 'Cheesecake' %}
+                        <img src="{{ url_for('static', filename='images/menu/cheesecake.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🍰</div>
+                    {% elif item.name == 'Tiramisu' %}
+                        <img src="{{ url_for('static', filename='images/menu/tiramisu.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🍰</div>
+                    {% elif item.name == 'Brownie' %}
+                        <img src="{{ url_for('static', filename='images/menu/brownie.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🍫</div>
+                    {% elif item.name == 'Chocolate Cake' %}
+                        <img src="{{ url_for('static', filename='images/menu/chocolate-cake.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🎂</div>
+                    {% elif item.name == 'Red Velvet Cake' %}
+                        <img src="{{ url_for('static', filename='images/menu/red-velvet-cake.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🎂</div>
+                    {% elif item.name == 'Blueberry Scone' %}
+                        <img src="{{ url_for('static', filename='images/menu/blueberry-scone.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🫐</div>
+                    {% elif item.name == 'Sandwich' %}
+                        <img src="{{ url_for('static', filename='images/menu/sandwich.jpg') }}?v={{ range(1, 1000) | random }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🥪</div>
+                    {% elif item.name == 'Panini' %}
+                        <img src="{{ url_for('static', filename='images/menu/panini.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🥪</div>
+                    {% elif item.name == 'Salad' %}
+                        <img src="{{ url_for('static', filename='images/menu/salad.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🥗</div>
+                    {% elif item.name == 'Soup' %}
+                        <img src="{{ url_for('static', filename='images/menu/soup.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🍲</div>
+                    {% elif item.name == 'Tea' %}
+                        <img src="{{ url_for('static', filename='images/menu/tea.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🍵</div>
+                    {% elif item.name == 'Green Tea' %}
+                        <img src="{{ url_for('static', filename='images/menu/green-tea.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🍵</div>
+                    {% elif item.name == 'Chai' %}
+                        <img src="{{ url_for('static', filename='images/menu/chai.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🍵</div>
+                    {% elif item.name == 'Hot Chocolate' %}
+                        <img src="{{ url_for('static', filename='images/menu/hot-chocolate.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">☕</div>
+                    {% elif item.name == 'Smoothie' %}
+                        <img src="{{ url_for('static', filename='images/menu/smoothie.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🥤</div>
+                    {% elif item.name == 'Juice' %}
+                        <img src="{{ url_for('static', filename='images/menu/juice.jpg') }}" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">🧃</div>
+                    {% else %}
+                        <img src="https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?w=200&h=200&fit=crop&crop=center" alt="{{ item.name }}" class="menu-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div class="emoji-fallback" style="display:none;">☕</div>
+                    {% endif %}
+                </div>
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ item.name }}</h5>
+                        <span class="price-tag">₹{{ "%.0f"|format(item.price) }}</span>
+                    </div>
+                    
+                    {% if item.category %}
+                        <small class="text-muted">{{ item.category.emoji }} {{ item.category.name }}</small>
+                    {% endif %}
+                    
+                    <p class="card-text mt-2">{{ item.description or 'Delicious and freshly made!' }}</p>
+                    
+                    {% if item.is_available %}
+                        {% if current_user.is_authenticated %}
+                            <form method="POST" action="{{ url_for('add_to_cart') }}" class="add-to-cart-form">
+                                <input type="hidden" name="menu_item_id" value="{{ item.id }}">
+                                <div class="row g-2">
+                                    <div class="col-4">
+                                        <label for="quantity_{{ item.id }}" class="form-label small mb-1">Qty</label>
+                                        <select class="form-select glass-input"
+                                                name="quantity"
+                                                id="quantity_{{ item.id }}">
+                                            {% for i in range(1, 11) %}
+                                                <option value="{{ i }}">{{ i }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-8" style="padding-top: 26px;">
+                                        <button type="submit" class="glass-btn w-100">
+                                            🛒 Add to Cart
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        {% else %}
+                            <div class="d-grid">
+                                <a href="{{ url_for('login') }}" class="glass-btn-secondary btn-sm">
+                                    🔑 Login to Order
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="d-grid">
+                            <button class="glass-btn-secondary btn-sm" disabled>
+                                ❌ Currently Unavailable
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card p-5 text-center fade-in">
+                <h4>😔 No items found</h4>
+                <p class="mb-3">We couldn't find any items in this category.</p>
+                <a href="{{ url_for('menu') }}" class="glass-btn">
+                    🍽️ View All Items
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Quick Actions -->
+    {% if current_user.is_authenticated %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="glass-card p-4 text-center fade-in">
+                <h5 class="mb-3">Quick Actions 🚀</h5>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="{{ url_for('cart') }}" class="glass-btn">
+                        🛒 View Cart
+                    </a>
+                    <a href="{{ url_for('orders') }}" class="glass-btn-secondary">
+                        📦 My Orders
+                    </a>
+                    <button class="glass-btn-secondary" onclick="clearCart()">
+                        🗑️ Clear Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Add to Cart Success Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content glass-card border-0">
+            <div class="modal-body text-center p-4">
+                <div class="mb-3">
+                    <i class="fas fa-check-circle fa-3x text-success"></i>
+                </div>
+                <h5>Added to Cart! 🛒</h5>
+                <p class="mb-3" id="cart-message">Item successfully added to your cart.</p>
+                <div class="d-flex gap-2">
+                    <button type="button" class="glass-btn-secondary flex-fill" data-bs-dismiss="modal">
+                        Continue Shopping
+                    </button>
+                    <a href="{{ url_for('cart') }}" class="glass-btn flex-fill">
+                        View Cart
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add to cart with AJAX
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            formData.append('ajax', '1');
+            
+            const button = this.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '⏳ Adding...';
+            button.disabled = true;
+            
+            fetch('{{ url_for("add_to_cart") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success modal
+                    const modal = new bootstrap.Modal(document.getElementById('cartModal'));
+                    modal.show();
+
+                    // Update cart count with actual count from server
+                    if (data.cart_count !== undefined) {
+                        updateCartCount(data.cart_count);
+                    }
+
+                    // Add success animation to card
+                    const card = this.closest('.menu-item-card');
+                    card.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        card.style.transform = '';
+                    }, 200);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('❌ Error adding item to cart. Please try again.');
+            })
+            .finally(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            });
+        });
+    });
+
+    // Update cart count
+    function updateCartCount(count = null) {
+        const cartBadge = document.getElementById('cart-count');
+        if (cartBadge) {
+            if (count !== null) {
+                cartBadge.textContent = count;
+            } else {
+                let currentCount = parseInt(cartBadge.textContent) || 0;
+                cartBadge.textContent = currentCount + 1;
+            }
+
+            // Show/hide badge based on count
+            const finalCount = parseInt(cartBadge.textContent);
+            if (finalCount > 0) {
+                cartBadge.style.display = 'flex';
+            } else {
+                cartBadge.style.display = 'none';
+            }
+
+            // Add animation
+            cartBadge.style.transform = 'scale(1.3)';
+            cartBadge.style.background = 'var(--caramel)';
+            setTimeout(() => {
+                cartBadge.style.transform = 'scale(1)';
+            }, 200);
+        }
+    }
+
+    // Clear cart function
+    function clearCart() {
+        if (confirm('🗑️ Are you sure you want to clear your cart?')) {
+            fetch('/clear_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('✅ Cart cleared successfully!');
+                    const cartBadge = document.getElementById('cart-count');
+                    if (cartBadge) cartBadge.textContent = '0';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('❌ Error clearing cart. Please try again.');
+            });
+        }
+    }
+
+    // Search functionality
+    function filterItems(searchTerm) {
+        const items = document.querySelectorAll('.menu-item-card');
+        items.forEach(item => {
+            const title = item.querySelector('.card-title').textContent.toLowerCase();
+            const description = item.querySelector('.card-text').textContent.toLowerCase();
+            
+            if (title.includes(searchTerm.toLowerCase()) || description.includes(searchTerm.toLowerCase())) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    }
+
+    // Smooth scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+
+    // Category filter active state
+    document.querySelectorAll('.glass-btn-secondary').forEach(btn => {
+        if (btn.classList.contains('active')) {
+            btn.style.background = 'rgba(139, 69, 19, 0.8)';
+            btn.style.color = 'white';
+        }
+    });
+</script>
+{% endblock %}

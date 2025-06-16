@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Afforgato Cafe ☕{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Welcome to Afforgato Cafe</h1>
+            <p class="hero-subtitle">Your premium coffee experience in Bengaluru! Discover our handcrafted beverages and delicious treats.</p>
+            <div class="mt-4">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('menu') }}" class="glass-btn me-3">
+                        🛒 Order Now
+                    </a>
+                    <a href="{{ url_for('orders') }}" class="glass-btn-secondary">
+                        📦 My Orders
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="glass-btn me-3">
+                        🔑 Login
+                    </a>
+                    <a href="{{ url_for('register') }}" class="glass-btn-secondary">
+                        📝 Sign Up
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="mb-4 section-title">Why Choose Afforgato? 🌟💖</h2>
+                <p class="section-subtitle">Discover what makes us special!</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="glass-card p-4 text-center h-100 fade-in feature-card">
+                    <div class="feature-icon mb-3">
+                        <div class="icon-wrapper">☕</div>
+                    </div>
+                    <h4 class="feature-title">Premium Coffee</h4>
+                    <p class="feature-desc">Sourced from the finest coffee beans around the world, roasted to perfection for that perfect cup. ✨</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card p-4 text-center h-100 fade-in feature-card">
+                    <div class="feature-icon mb-3">
+                        <div class="icon-wrapper">⚡</div>
+                    </div>
+                    <h4 class="feature-title">Quick Service</h4>
+                    <p class="feature-desc">Fast and efficient service without compromising on quality. Your perfect cup is just minutes away! 🚀</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="glass-card p-4 text-center h-100 fade-in feature-card">
+                    <div class="feature-icon mb-3">
+                        <div class="icon-wrapper">💖</div>
+                    </div>
+                    <h4 class="feature-title">Made with Love</h4>
+                    <p class="feature-desc">Every drink is crafted with passion and attention to detail by our skilled baristas. 👨‍🍳✨</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Items Section -->
+{% if featured_items %}
+<section class="section-spacing">
+    <div class="container">
+        <div class="content-wrapper">
+            <h2 class="mb-4">Featured Items 🌟</h2>
+            <p class="lead mb-5">Try our most popular drinks and treats!</p>
+        </div>
+        <div class="menu-grid">
+            {% for item in featured_items %}
+            <div class="glass-card">
+                <div class="menu-item-image">
+                    {{ item.emoji or '☕' }}
+                </div>
+                <div class="mt-3">
+                    <h5 class="card-title">{{ item.name }}</h5>
+                    <p class="card-text">{{ item.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <span class="price-tag">₹{{ "%.0f"|format(item.price) }}</span>
+                        {% if current_user.is_authenticated %}
+                            <form method="POST" action="{{ url_for('add_to_cart') }}" class="d-inline">
+                                <input type="hidden" name="menu_item_id" value="{{ item.id }}">
+                                <button type="submit" class="glass-btn-secondary btn-sm">
+                                    🛒 Add to Cart
+                                </button>
+                            </form>
+                        {% else %}
+                            <a href="{{ url_for('login') }}" class="glass-btn-secondary btn-sm">
+                                🔑 Login to Order
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-5">
+            <a href="{{ url_for('menu') }}" class="glass-btn">
+                📋 View Full Menu
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Categories Section -->
+{% if categories %}
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="mb-4">Our Categories 📂</h2>
+                <p class="lead">Discover our wide range of delicious offerings!</p>
+            </div>
+        </div>
+        <div class="row g-3">
+            {% for category in categories %}
+            <div class="col-lg-2 col-md-4 col-6">
+                <a href="{{ url_for('menu', category=category.id) }}" class="text-decoration-none">
+                    <div class="glass-card p-3 text-center h-100 fade-in">
+                        <div class="category-icon mb-2">
+                            <span style="font-size: 2rem;">{{ category.emoji or '📋' }}</span>
+                        </div>
+                        <h6 class="mb-0">{{ category.name }}</h6>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Simple Call to Action -->
+<section class="py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="glass-card p-5 text-center fade-in">
+                    <h3 class="mb-4">Ready for Great Coffee? ☕</h3>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('menu') }}" class="glass-btn me-3">
+                            🛒 Order Now
+                        </a>
+                        <a href="{{ url_for('orders') }}" class="glass-btn-secondary">
+                            📦 My Orders
+                        </a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="glass-btn me-3">
+                            🔑 Login
+                        </a>
+                        <a href="{{ url_for('register') }}" class="glass-btn-secondary">
+                            📝 Sign Up
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Add fade-in animation on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+</script>
+{% endblock %}

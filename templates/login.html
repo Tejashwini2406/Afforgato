@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Afforgato Cafe ☕{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="container">
+        <div class="form-container">
+            <div class="glass-form">
+                <div class="text-center mb-4">
+                    <h2 class="mb-3">Welcome Back! 👋</h2>
+                    <p class="text-muted">Sign in to your Afforgato account</p>
+                </div>
+
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            👤 Username
+                        </label>
+                        <input type="text" 
+                               class="form-control glass-input" 
+                               id="username" 
+                               name="username" 
+                               placeholder="Enter your username"
+                               required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            🔒 Password
+                        </label>
+                        <input type="password" 
+                               class="form-control glass-input" 
+                               id="password" 
+                               name="password" 
+                               placeholder="Enter your password"
+                               required>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="glass-btn">
+                            🔑 Sign In
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="mb-0">
+                            Don't have an account? 
+                            <a href="{{ url_for('register') }}" class="text-brown text-decoration-none fw-bold">
+                                📝 Sign up here
+                            </a>
+                        </p>
+                    </div>
+                </form>
+
+                <!-- Demo Accounts -->
+                <div class="mt-4 pt-4 border-top border-secondary">
+                    <h6 class="text-center mb-3">🎯 Demo Accounts</h6>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <button type="button" 
+                                    class="glass-btn-secondary w-100 btn-sm demo-login" 
+                                    data-username="admin" 
+                                    data-password="admin123">
+                                👨‍💼 Admin Demo
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" 
+                                    class="glass-btn-secondary w-100 btn-sm demo-login" 
+                                    data-username="demo" 
+                                    data-password="demo123">
+                                👤 User Demo
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-center mt-2 small text-muted">
+                        Click to auto-fill demo credentials
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Demo login functionality
+    document.querySelectorAll('.demo-login').forEach(button => {
+        button.addEventListener('click', function() {
+            const username = this.dataset.username;
+            const password = this.dataset.password;
+            
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            
+            // Add visual feedback
+            this.innerHTML = '✅ Credentials Filled';
+            setTimeout(() => {
+                this.innerHTML = this.innerHTML.includes('Admin') ? '👨‍💼 Admin Demo' : '👤 User Demo';
+            }, 2000);
+        });
+    });
+
+    // Form validation and effects
+    const form = document.querySelector('form');
+    const inputs = document.querySelectorAll('.glass-input');
+
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+
+        input.addEventListener('blur', function() {
+            if (!this.value) {
+                this.parentElement.classList.remove('focused');
+            }
+        });
+
+        input.addEventListener('input', function() {
+            if (this.value) {
+                this.classList.add('has-value');
+            } else {
+                this.classList.remove('has-value');
+            }
+        });
+    });
+
+    form.addEventListener('submit', function(e) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '⏳ Signing In...';
+        submitBtn.disabled = true;
+    });
+
+    // Add floating label effect
+    const style = document.createElement('style');
+    style.textContent = `
+        .focused label {
+            transform: translateY(-8px) scale(0.9);
+            color: var(--brown-primary);
+        }
+        
+        .has-value + label {
+            transform: translateY(-8px) scale(0.9);
+        }
+        
+        .form-label {
+            transition: all 0.3s ease;
+            transform-origin: left top;
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+
+{% block title %}Payment - Afforgato Cafe ☕{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="glass-card text-center">
+                <!-- Payment Processing Animation -->
+                <div class="payment-animation mb-4">
+                    <div class="coffee-cup-animation">
+                        ☕
+                    </div>
+                    <div class="steam-lines">
+                        <div class="steam-line"></div>
+                        <div class="steam-line"></div>
+                        <div class="steam-line"></div>
+                    </div>
+                </div>
+
+                <h2 class="mb-3">Processing Your Payment 💳</h2>
+                <p class="lead mb-4">Please wait while we process your order...</p>
+
+                <!-- Order Details -->
+                <div class="glass-card mb-4 text-start">
+                    <h5 class="card-title">📋 Order Details</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <strong>Order #{{ order.order_number or order.id }}</strong>
+                        </div>
+                        <div class="col-6 text-end">
+                            <strong class="text-brown">₹{{ "%.0f"|format(order.total_amount) }}</strong>
+                        </div>
+                    </div>
+                    <hr class="border-secondary my-3">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Payment Method:</small><br>
+                            <span>{{ order.payment_method.replace('_', ' ').title() }}</span>
+                        </div>
+                        <div class="col-6 text-end">
+                            <small class="text-muted">Status:</small><br>
+                            <span class="badge bg-warning">{{ order.status.title() }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Progress -->
+                <div class="payment-progress mb-4">
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar bg-brown progress-bar-animated progress-bar-striped" 
+                             role="progressbar" 
+                             style="width: 0%" 
+                             id="paymentProgress"></div>
+                    </div>
+                    <div class="progress-steps">
+                        <div class="step active" id="step1">
+                            <div class="step-icon">1</div>
+                            <div class="step-label">Validating</div>
+                        </div>
+                        <div class="step" id="step2">
+                            <div class="step-icon">2</div>
+                            <div class="step-label">Processing</div>
+                        </div>
+                        <div class="step" id="step3">
+                            <div class="step-icon">3</div>
+                            <div class="step-label">Confirming</div>
+                        </div>
+                        <div class="step" id="step4">
+                            <div class="step-icon">✓</div>
+                            <div class="step-label">Complete</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Messages -->
+                <div class="payment-messages mb-4">
+                    <div class="message active" id="message1">
+                        🔍 Validating payment information...
+                    </div>
+                    <div class="message" id="message2">
+                        💳 Processing payment with your bank...
+                    </div>
+                    <div class="message" id="message3">
+                        ✅ Confirming transaction...
+                    </div>
+                    <div class="message" id="message4">
+                        🎉 Payment successful! Preparing your order...
+                    </div>
+                </div>
+
+
+
+                <!-- Action Buttons (Initially Hidden) -->
+                <div class="action-buttons" id="actionButtons" style="display: none;">
+                    <form method="POST" action="{{ url_for('process_payment', order_id=order.id) }}" class="d-inline">
+                        <button type="submit" class="glass-btn me-3" id="confirmPayment">
+                            ✅ Confirm Payment
+                        </button>
+                    </form>
+                    <a href="{{ url_for('cart') }}" class="glass-btn-secondary">
+                        ← Back to Cart
+                    </a>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div class="loading-spinner" id="loadingSpinner">
+                    <div class="spinner-border text-brown" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coffee Features -->
+            <div class="row g-3 mt-4">
+                <div class="col-3">
+                    <div class="glass-card text-center">
+                        <div class="mb-2">☕</div>
+                        <small>Fresh</small>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="glass-card text-center">
+                        <div class="mb-2">⚡</div>
+                        <small>Fast</small>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="glass-card text-center">
+                        <div class="mb-2">🎯</div>
+                        <small>Quality</small>
+                    </div>
+                </div>
+                <div class="col-3">
+                    <div class="glass-card text-center">
+                        <div class="mb-2">✅</div>
+                        <small>Verified</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Payment processing simulation
+    let currentStep = 1;
+    const totalSteps = 4;
+    const stepDuration = 2000; // 2 seconds per step
+
+    function updateProgress() {
+        const progressBar = document.getElementById('paymentProgress');
+        const progress = (currentStep / totalSteps) * 100;
+        progressBar.style.width = progress + '%';
+
+        // Update step indicators
+        for (let i = 1; i <= totalSteps; i++) {
+            const step = document.getElementById(`step${i}`);
+            const message = document.getElementById(`message${i}`);
+            
+            if (i <= currentStep) {
+                step.classList.add('active');
+                if (i === currentStep) {
+                    message.classList.add('active');
+                } else {
+                    message.classList.remove('active');
+                }
+            } else {
+                step.classList.remove('active');
+                message.classList.remove('active');
+            }
+        }
+
+        // Show action buttons when complete
+        if (currentStep >= totalSteps) {
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('actionButtons').style.display = 'block';
+            
+            // Auto-submit after a delay (simulate automatic processing)
+            setTimeout(() => {
+                document.getElementById('confirmPayment').click();
+            }, 3000);
+        }
+    }
+
+    // Start payment processing simulation
+    function startPaymentProcess() {
+        const interval = setInterval(() => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateProgress();
+            } else {
+                clearInterval(interval);
+            }
+        }, stepDuration);
+    }
+
+    // Initialize
+    updateProgress();
+    setTimeout(startPaymentProcess, 1000);
+
+    // Coffee cup animation
+    const style = document.createElement('style');
+    style.textContent = `
+        .payment-animation {
+            position: relative;
+            height: 100px;
+            margin: 20px 0;
+        }
+        
+        .coffee-cup-animation {
+            font-size: 4rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .steam-lines {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .steam-line {
+            width: 2px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            margin: 0 3px;
+            display: inline-block;
+            animation: steam 1.5s ease-in-out infinite;
+            border-radius: 1px;
+        }
+        
+        .steam-line:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+        
+        .steam-line:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes steam {
+            0% { opacity: 0; transform: translateY(0) scale(1); }
+            50% { opacity: 1; transform: translateY(-15px) scale(1.1); }
+            100% { opacity: 0; transform: translateY(-30px) scale(1.2); }
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .step {
+            text-align: center;
+            flex: 1;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            opacity: 1;
+            color: var(--brown-primary);
+        }
+        
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-icon {
+            background: var(--brown-primary);
+            border-color: var(--brown-primary);
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .step-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .payment-messages {
+            height: 60px;
+            position: relative;
+        }
+        
+        .message {
+            position: absolute;
+            width: 100%;
+            opacity: 0;
+            transition: all 0.5s ease;
+            font-weight: 500;
+            color: var(--brown-primary);
+        }
+        
+        .message.active {
+            opacity: 1;
+        }
+        
+        .security-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .loading-spinner {
+            margin: 20px 0;
+        }
+        
+        .action-buttons {
+            animation: fadeInUp 0.5s ease;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Prevent page refresh during processing
+    window.addEventListener('beforeunload', function(e) {
+        if (currentStep < totalSteps) {
+            e.preventDefault();
+            e.returnValue = 'Payment is being processed. Are you sure you want to leave?';
+        }
+    });
+
+    // Form submission handling
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const submitBtn = document.getElementById('confirmPayment');
+        submitBtn.innerHTML = '⏳ Finalizing...';
+        submitBtn.disabled = true;
+    });
+</script>
+{% endblock %}

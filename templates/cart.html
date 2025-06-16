@@ -1,0 +1,473 @@
+{% extends "base.html" %}
+
+{% block title %}Shopping Cart - Afforgato Cafe ☕{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="page-title">
+                    🛒 Your Cart
+                </h1>
+                <a href="{{ url_for('menu') }}" class="glass-btn-secondary">
+                    ← Continue Shopping
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if cart_items %}
+    <div class="row">
+        <!-- Cart Items -->
+        <div class="col-lg-8">
+            <div class="glass-card">
+                <h5 class="card-title">Cart Items ({{ cart_items|length }})</h5>
+                
+                {% for item in cart_items %}
+                <div class="cart-item mb-4 pb-4 border-bottom border-secondary" data-cart-id="{{ item.id }}" style="padding: 1rem; background: rgba(255,255,255,0.02); border-radius: 12px;">
+                    <div class="row align-items-center g-3">
+                        <div class="col-lg-1 col-md-2 col-3">
+                            <div class="cart-item-image">
+                                {{ item.menu_item.emoji or '☕' }}
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-9">
+                            <h6 class="mb-2 fw-bold">{{ item.menu_item.name }}</h6>
+                            <small class="text-muted d-block mb-1">
+                                {{ item.menu_item.category.emoji if item.menu_item.category else '📂' }}
+                                {{ item.menu_item.category.name if item.menu_item.category else 'General' }}
+                            </small>
+                            <p class="mb-0 small text-muted">{{ item.menu_item.description or 'Perfect blend of espresso, steamed milk, and foam' }}</p>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-4">
+                            <div class="price-display text-center">
+                                <strong class="text-brown">₹{{ "%.0f"|format(item.menu_item.price) }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-2 col-4">
+                            <form method="POST" action="{{ url_for('update_cart') }}" class="quantity-form">
+                                <input type="hidden" name="cart_id" value="{{ item.id }}">
+                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                    <button type="button" class="btn btn-outline-brown btn-sm qty-btn" data-action="decrease" style="width: 35px; height: 35px; border-radius: 8px;">-</button>
+                                    <input type="number"
+                                           class="form-control text-center fw-bold"
+                                           name="quantity"
+                                           value="{{ item.quantity }}"
+                                           min="0"
+                                           max="10"
+                                           style="width: 50px; height: 35px; border-radius: 8px; border: 2px solid #8B4513;">
+                                    <button type="button" class="btn btn-outline-brown btn-sm qty-btn" data-action="increase" style="width: 35px; height: 35px; border-radius: 8px;">+</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-lg-2 col-md-2 col-12">
+                            <div class="text-center">
+                                <div class="mb-2">
+                                    <strong class="item-subtotal text-brown fs-5">₹{{ "%.0f"|format(item.subtotal) }}</strong>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-danger remove-item" data-cart-id="{{ item.id }}" style="border-radius: 8px;">
+                                    🗑️ Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Cart Actions -->
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <button type="button" class="glass-btn-secondary" onclick="clearAllItems()">
+                        🗑️ Clear Cart
+                    </button>
+                    <button type="button" class="glass-btn-secondary" onclick="updateAllQuantities()">
+                        🔄 Update Cart
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-4">
+            <div class="glass-card sticky-top" style="top: 100px;">
+                <h5 class="card-title">📋 Order Summary</h5>
+                
+                {% set subtotal = total|float %}
+                {% set gst_amount = subtotal * 0.18 %}
+                {% set delivery_fee = 50 if subtotal < 500 else 0 %}
+                {% set final_total = subtotal + gst_amount + delivery_fee %}
+
+                <div class="summary-row d-flex justify-content-between mb-2">
+                    <span>Subtotal:</span>
+                    <span id="cart-subtotal">₹{{ "%.0f"|format(subtotal) }}</span>
+                </div>
+
+                <div class="summary-row d-flex justify-content-between mb-2">
+                    <span>GST (18%):</span>
+                    <span id="cart-tax">₹{{ "%.0f"|format(gst_amount) }}</span>
+                </div>
+
+                <div class="summary-row d-flex justify-content-between mb-2">
+                    <span>Delivery Fee:</span>
+                    <span id="delivery-fee">
+                        {% if delivery_fee == 0 %}
+                            <span class="text-success">FREE</span>
+                        {% else %}
+                            ₹{{ "%.0f"|format(delivery_fee) }}
+                        {% endif %}
+                    </span>
+                </div>
+
+                <hr class="border-secondary">
+
+                <div class="summary-row d-flex justify-content-between mb-4">
+                    <strong>Total:</strong>
+                    <strong id="cart-total">
+                        ₹{{ "%.0f"|format(final_total) }}
+                    </strong>
+                </div>
+
+                {% if subtotal < 500 %}
+                <div class="alert alert-info mb-3">
+                    <small>
+                        🚚 Add ₹{{ "%.0f"|format(500 - subtotal) }} more for free delivery!
+                    </small>
+                </div>
+                {% else %}
+                <div class="alert alert-success mb-3">
+                    <small>
+                        🎉 You qualify for free delivery!
+                    </small>
+                </div>
+                {% endif %}
+
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('checkout') }}" class="glass-btn">
+                        💳 Proceed to Checkout
+                    </a>
+                    <a href="{{ url_for('menu') }}" class="glass-btn-secondary">
+                        📋 Add More Items
+                    </a>
+                </div>
+
+                <!-- Estimated Time -->
+                <div class="mt-4 p-3 bg-light rounded">
+                    <div class="text-center">
+                        <h6>⏰ Estimated Preparation Time</h6>
+                        <span class="badge" style="background: var(--brown-primary);">15-20 minutes</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Empty Cart -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card text-center">
+                <div class="empty-cart-animation mb-4">
+                    <div class="sad-coffee">☕</div>
+                    <div class="empty-sparkles">
+                        <span>✨</span>
+                        <span>💫</span>
+                        <span>⭐</span>
+                    </div>
+                </div>
+                <h3 class="mb-3 empty-cart-title">Your cart is feeling lonely! 🥺</h3>
+                <p class="lead mb-4">Let's fill it with some delicious treats and make it happy! 😊💕</p>
+                <a href="{{ url_for('menu') }}" class="glass-btn">
+                    🍽️ Discover Delicious Items
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Quantity controls
+    document.querySelectorAll('.qty-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const action = this.dataset.action;
+            const input = this.parentElement.querySelector('input[name="quantity"]');
+            let currentValue = parseInt(input.value);
+            
+            if (action === 'increase' && currentValue < 10) {
+                input.value = currentValue + 1;
+            } else if (action === 'decrease' && currentValue > 0) {
+                input.value = currentValue - 1;
+            }
+            
+            // Auto-submit form after a delay
+            clearTimeout(input.updateTimeout);
+            input.updateTimeout = setTimeout(() => {
+                updateCartItem(input.closest('.quantity-form'));
+            }, 1000);
+        });
+    });
+
+    // Quantity input change
+    document.querySelectorAll('input[name="quantity"]').forEach(input => {
+        input.addEventListener('change', function() {
+            clearTimeout(this.updateTimeout);
+            updateCartItem(this.closest('.quantity-form'));
+        });
+    });
+
+    // Update cart item
+    function updateCartItem(form) {
+        const formData = new FormData(form);
+        const cartItem = form.closest('.cart-item');
+        const quantity = parseInt(formData.get('quantity'));
+        
+        if (quantity === 0) {
+            if (confirm('🗑️ Remove this item from cart?')) {
+                removeCartItem(formData.get('cart_id'));
+            } else {
+                form.querySelector('input[name="quantity"]').value = 1;
+            }
+            return;
+        }
+        
+        fetch('{{ url_for("update_cart") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                updateCartDisplay();
+                showToast('✅ Cart updated!');
+            } else {
+                showToast('❌ Error updating cart');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('❌ Error updating cart');
+        });
+    }
+
+    // Remove item
+    document.querySelectorAll('.remove-item').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const cartId = this.dataset.cartId;
+            if (confirm('🗑️ Remove this item from cart?')) {
+                removeCartItem(cartId);
+            }
+        });
+    });
+
+    function removeCartItem(cartId) {
+        const formData = new FormData();
+        formData.append('cart_id', cartId);
+        formData.append('quantity', '0');
+        
+        fetch('{{ url_for("update_cart") }}', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                showToast('❌ Error removing item');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('❌ Error removing item');
+        });
+    }
+
+    // Clear all items
+    function clearAllItems() {
+        if (confirm('🗑️ Are you sure you want to clear your entire cart?')) {
+            fetch('/clear_cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    showToast('❌ Error clearing cart');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('❌ Error clearing cart');
+            });
+        }
+    }
+
+    // Update all quantities
+    function updateAllQuantities() {
+        const forms = document.querySelectorAll('.quantity-form');
+        let promises = [];
+        
+        forms.forEach(form => {
+            const formData = new FormData(form);
+            promises.push(
+                fetch('{{ url_for("update_cart") }}', {
+                    method: 'POST',
+                    body: formData
+                })
+            );
+        });
+        
+        Promise.all(promises)
+            .then(() => {
+                updateCartDisplay();
+                showToast('✅ Cart updated!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('❌ Error updating cart');
+            });
+    }
+
+    // Update cart display (recalculate totals)
+    function updateCartDisplay() {
+        // This would typically recalculate totals based on current quantities
+        // For now, we'll just reload the page
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    }
+
+
+
+    // Update cart count in navbar
+    function updateCartCount() {
+        const cartBadge = document.getElementById('cart-count');
+        if (cartBadge) {
+            let currentCount = parseInt(cartBadge.textContent) || 0;
+            cartBadge.textContent = currentCount + 1;
+
+            // Add animation
+            cartBadge.style.transform = 'scale(1.3)';
+            cartBadge.style.background = 'var(--caramel)';
+            setTimeout(() => {
+                cartBadge.style.transform = 'scale(1)';
+            }, 200);
+        }
+    }
+
+    // Show toast notification
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--caramel);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            box-shadow: var(--shadow-medium);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        `;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    // Cart item image styling
+    const style = document.createElement('style');
+    style.textContent = `
+        .cart-item-image {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, var(--brown-primary), var(--brown-secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .cart-item {
+            transition: all 0.3s ease;
+        }
+        
+        .cart-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px !important;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Recommended Items Styling */
+        .recommended-item {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .recommended-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .recommend-emoji {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .recommend-name {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .recommend-price {
+            color: var(--caramel);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .quick-add-btn {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+            transition: all 0.3s ease;
+        }
+
+        .quick-add-btn:hover {
+            transform: scale(1.05);
+        }
+
+        #cart-count {
+            background: var(--caramel) !important;
+            color: var(--text-primary) !important;
+            font-weight: 700;
+            min-width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.8rem;
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

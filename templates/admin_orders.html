@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+
+{% block title %}Order Management - Afforgato Cafe Admin ☕{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0 admin-title">
+                    <span class="admin-icon">📦</span>
+                    Order Management
+                </h1>
+                <div class="admin-actions">
+                    <a href="{{ url_for('admin_dashboard') }}" class="glass-btn-secondary me-2">
+                        ← Back to Dashboard
+                    </a>
+                    <button class="glass-btn" onclick="refreshOrders()">
+                        🔄 Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="glass-card p-3">
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <a href="{{ url_for('admin_orders', status='all') }}" 
+                       class="filter-btn {{ 'active' if status_filter == 'all' else '' }}">
+                        📋 All Orders
+                    </a>
+                    <a href="{{ url_for('admin_orders', status='pending') }}" 
+                       class="filter-btn {{ 'active' if status_filter == 'pending' else '' }}">
+                        ⏳ Pending
+                    </a>
+                    <a href="{{ url_for('admin_orders', status='confirmed') }}" 
+                       class="filter-btn {{ 'active' if status_filter == 'confirmed' else '' }}">
+                        ✅ Confirmed
+                    </a>
+                    <a href="{{ url_for('admin_orders', status='preparing') }}" 
+                       class="filter-btn {{ 'active' if status_filter == 'preparing' else '' }}">
+                        👨‍🍳 Preparing
+                    </a>
+                    <a href="{{ url_for('admin_orders', status='ready') }}" 
+                       class="filter-btn {{ 'active' if status_filter == 'ready' else '' }}">
+                        🔔 Ready
+                    </a>
+                    <a href="{{ url_for('admin_orders', status='delivered') }}" 
+                       class="filter-btn {{ 'active' if status_filter == 'delivered' else '' }}">
+                        📦 Delivered
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Grid -->
+    <div class="row g-4">
+        {% for order in orders %}
+        <div class="col-lg-6 col-xl-4">
+            <div class="glass-card order-card h-100" data-order-id="{{ order.id }}">
+                <!-- Order Header -->
+                <div class="order-header p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">Order #{{ order.id }}</h6>
+                        <span class="order-time">{{ order.created_at.strftime('%I:%M %p') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="customer-name">{{ order.user.full_name }}</span>
+                        <span class="order-total">${{ "%.2f"|format(order.total_amount) }}</span>
+                    </div>
+                </div>
+
+                <!-- Order Status -->
+                <div class="order-status-section p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="status-label">Status:</span>
+                        <span class="status-badge status-{{ order.status }}">
+                            {{ order.status_emoji }} {{ order.status.title() }}
+                        </span>
+                    </div>
+                    <div class="status-controls">
+                        <select class="form-select form-select-sm glass-input status-select" 
+                                onchange="updateOrderStatus({{ order.id }}, this.value)">
+                            <option value="pending" {{ 'selected' if order.status == 'pending' else '' }}>⏳ Pending</option>
+                            <option value="confirmed" {{ 'selected' if order.status == 'confirmed' else '' }}>✅ Confirmed</option>
+                            <option value="preparing" {{ 'selected' if order.status == 'preparing' else '' }}>👨‍🍳 Preparing</option>
+                            <option value="ready" {{ 'selected' if order.status == 'ready' else '' }}>🔔 Ready</option>
+                            <option value="delivered" {{ 'selected' if order.status == 'delivered' else '' }}>📦 Delivered</option>
+                            <option value="cancelled" {{ 'selected' if order.status == 'cancelled' else '' }}>❌ Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="order-items p-3">
+                    <h6 class="mb-2">Items:</h6>
+                    {% for item in order.order_items %}
+                    <div class="order-item d-flex justify-content-between align-items-center mb-2">
+                        <div class="item-info">
+                            <span class="item-emoji">{{ item.menu_item.emoji or '☕' }}</span>
+                            <span class="item-name">{{ item.menu_item.name }}</span>
+                            <span class="item-qty">×{{ item.quantity }}</span>
+                        </div>
+                        <span class="item-price">${{ "%.2f"|format(item.subtotal) }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Order Actions -->
+                <div class="order-actions p-3">
+                    <div class="d-grid gap-2">
+
+                        {% if order.status in ['pending', 'confirmed'] %}
+                        <button class="btn btn-outline-success btn-sm" onclick="quickConfirm({{ order.id }})">
+                            ⚡ Quick Confirm
+                        </button>
+                        {% endif %}
+                        {% if order.status == 'preparing' %}
+                        <button class="btn btn-outline-info btn-sm" onclick="markReady({{ order.id }})">
+                            🔔 Mark Ready
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not orders %}
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card p-5 text-center">
+                <div class="empty-state">
+                    <div class="empty-icon">📦</div>
+                    <h4>No orders found</h4>
+                    <p class="text-muted">No orders match the current filter.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Update order status
+    function updateOrderStatus(orderId, newStatus) {
+        fetch('/admin/update_order_status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                order_id: orderId,
+                status: newStatus
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(`✅ Order #${orderId} status updated to ${newStatus}`);
+                updateOrderCard(orderId, newStatus);
+            } else {
+                showToast('❌ Failed to update order status');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('❌ Error updating order status');
+        });
+    }
+
+    // Quick actions
+    function quickConfirm(orderId) {
+        updateOrderStatus(orderId, 'confirmed');
+    }
+
+    function markReady(orderId) {
+        updateOrderStatus(orderId, 'ready');
+    }
+
+
+
+    // Refresh orders
+    function refreshOrders() {
+        location.reload();
+    }
+
+    // Update order card appearance
+    function updateOrderCard(orderId, status) {
+        const card = document.querySelector(`[data-order-id="${orderId}"]`);
+        if (card) {
+            const statusBadge = card.querySelector('.status-badge');
+            statusBadge.className = `status-badge status-${status}`;
+            
+            const statusEmojis = {
+                'pending': '⏳',
+                'confirmed': '✅',
+                'preparing': '👨‍🍳',
+                'ready': '🔔',
+                'delivered': '📦',
+                'cancelled': '❌'
+            };
+            
+            statusBadge.textContent = `${statusEmojis[status]} ${status.charAt(0).toUpperCase() + status.slice(1)}`;
+        }
+    }
+
+
+
+    // Show toast notification
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--caramel);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: 10px;
+            box-shadow: var(--shadow-medium);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    // Initialize timers and update every minute
+    updateTimers();
+    setInterval(updateTimers, 60000);
+
+    // Auto-refresh every 30 seconds for active orders
+    setInterval(() => {
+        const activeOrders = document.querySelectorAll('[data-order-id]').length;
+        if (activeOrders > 0) {
+            console.log('Auto-refreshing orders...');
+            // In production, you'd fetch only updated data
+        }
+    }, 30000);
+
+    // Add custom styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .filter-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: var(--caramel);
+            color: var(--text-primary);
+            border-color: var(--caramel);
+        }
+        
+        .order-card {
+            transition: all 0.3s ease;
+        }
+        
+        .order-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .order-header {
+            background: var(--accent-bg);
+        }
+        
+        .customer-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .order-total {
+            font-weight: 700;
+            color: var(--caramel);
+            font-size: 1.1rem;
+        }
+        
+        .order-time {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .status-pending { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .status-confirmed { background: rgba(25, 135, 84, 0.2); color: #198754; }
+        .status-preparing { background: rgba(13, 110, 253, 0.2); color: #0d6efd; }
+        .status-ready { background: rgba(102, 16, 242, 0.2); color: #6610f2; }
+        .status-delivered { background: rgba(25, 135, 84, 0.2); color: #198754; }
+        .status-cancelled { background: rgba(220, 53, 69, 0.2); color: #dc3545; }
+        
+        .order-item {
+            padding: 5px 0;
+            border: none !important;
+            border-bottom: none !important;
+        }
+
+        /* Remove all red borders from admin orders */
+        .order-header, .order-status-section, .order-items, .order-timer,
+        .order-card, .order-card *, .glass-card, .glass-card *,
+        .border-bottom, .border-secondary, .border-top, .border {
+            border: none !important;
+            border-bottom: none !important;
+            border-top: none !important;
+            border-left: none !important;
+            border-right: none !important;
+            border-color: transparent !important;
+        }
+
+        /* Specifically target any remaining borders */
+        * {
+            border-bottom-color: transparent !important;
+            border-top-color: transparent !important;
+        }
+        
+        .item-emoji {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+        
+        .item-name {
+            font-weight: 500;
+        }
+        
+        .item-qty {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .item-price {
+            font-weight: 600;
+            color: var(--caramel);
+        }
+        
+        .order-timer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 12px;
+            background: var(--secondary-bg);
+            border-radius: 0 0 20px 20px;
+        }
+        
+
+        
+        .timer-text {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+        
+        .empty-state {
+            padding: 40px 20px;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

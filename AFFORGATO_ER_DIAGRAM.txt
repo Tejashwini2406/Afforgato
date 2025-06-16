@@ -1,0 +1,305 @@
+================================================================================
+                    AFFORGATO COFFEE SHOP - ENTITY RELATIONSHIP DIAGRAM
+================================================================================
+
+ENTITY RELATIONSHIP OVERVIEW
+================================================================================
+
+This diagram represents the complete database schema for the Afforgato Coffee 
+Shop application, showing all entities, their attributes, and relationships.
+
+ENTITIES AND ATTRIBUTES
+================================================================================
+
+1. USERS (Primary Entity)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ USERS                                                                   │
+   │ ─────────────────────────────────────────────────────────────────────── │
+   │ • id (PK) - INT AUTO_INCREMENT                                          │
+   │ • username (UK) - VARCHAR(80) UNIQUE NOT NULL                          │
+   │ • email (UK) - VARCHAR(120) UNIQUE NOT NULL                            │
+   │ • password_hash - VARCHAR(255) NOT NULL                                │
+   │ • first_name - VARCHAR(50) NOT NULL                                    │
+   │ • last_name - VARCHAR(50) NOT NULL                                     │
+   │ • phone - VARCHAR(20)                                                  │
+   │ • is_admin - BOOLEAN DEFAULT FALSE                                     │
+   │ • is_active - BOOLEAN DEFAULT TRUE                                     │
+   │ • created_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP                     │
+   │ • updated_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE           │
+   │                                                                         │
+   │ Computed Properties:                                                    │
+   │ • full_name - Computed: first_name + last_name                         │
+   │ • address - From default address relationship                          │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+2. USER_PROFILES (Normalized Profile Data)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ USER_PROFILES                                                           │
+   │ ─────────────────────────────────────────────────────────────────────── │
+   │ • id (PK) - INT AUTO_INCREMENT                                          │
+   │ • user_id (FK) - INT NOT NULL → USERS.id                               │
+   │ • date_of_birth - DATE                                                 │
+   │ • preferences - TEXT                                                   │
+   │ • loyalty_points - INT DEFAULT 0                                       │
+   │ • total_orders - INT DEFAULT 0                                         │
+   │ • total_spent - DECIMAL(10,2) DEFAULT 0.00                            │
+   │ • created_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP                     │
+   │ • updated_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE           │
+   │                                                                         │
+   │ Auto-created via trigger when user is created                          │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+3. ADDRESSES (Normalized Address Data)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ ADDRESSES                                                               │
+   │ ─────────────────────────────────────────────────────────────────────── │
+   │ • id (PK) - INT AUTO_INCREMENT                                          │
+   │ • user_id (FK) - INT NOT NULL → USERS.id                               │
+   │ • address_type - ENUM('home', 'work', 'other') DEFAULT 'home'          │
+   │ • street_address - TEXT NOT NULL                                       │
+   │ • city - VARCHAR(100) NOT NULL                                         │
+   │ • state - VARCHAR(100) NOT NULL                                        │
+   │ • postal_code - VARCHAR(20) NOT NULL                                   │
+   │ • country - VARCHAR(100) DEFAULT 'India'                               │
+   │ • is_default - BOOLEAN DEFAULT FALSE                                   │
+   │ • created_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP                     │
+   │ • updated_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE           │
+   │                                                                         │
+   │ Supports multiple addresses per user                                    │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+4. CATEGORIES (Menu Organization)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ CATEGORIES                                                              │
+   │ ─────────────────────────────────────────────────────────────────────── │
+   │ • id (PK) - INT AUTO_INCREMENT                                          │
+   │ • name - VARCHAR(100) NOT NULL                                          │
+   │ • description - TEXT                                                   │
+   │ • emoji - VARCHAR(10)                                                  │
+   │ • is_active - BOOLEAN DEFAULT TRUE                                     │
+   │ • display_order - INT DEFAULT 0                                        │
+   │ • created_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP                     │
+   │ • updated_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE           │
+   │                                                                         │
+   │ Examples: Hot Coffee ☕, Cold Coffee 🧊, Tea 🍵, Pastries 🥐          │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+5. MENU_ITEMS (Product Catalog)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ MENU_ITEMS                                                              │
+   │ ─────────────────────────────────────────────────────────────────────── │
+   │ • id (PK) - INT AUTO_INCREMENT                                          │
+   │ • name - VARCHAR(100) NOT NULL                                          │
+   │ • description - TEXT                                                   │
+   │ • price - DECIMAL(8,2) NOT NULL                                        │
+   │ • category_id (FK) - INT → CATEGORIES.id                               │
+   │ • emoji - VARCHAR(10)                                                  │
+   │ • image_url - VARCHAR(255)                                             │
+   │ • is_available - BOOLEAN DEFAULT TRUE                                  │
+   │ • preparation_time - INT DEFAULT 5                                     │
+   │ • calories - INT                                                       │
+   │ • ingredients - TEXT                                                   │
+   │ • allergens - TEXT                                                     │
+   │ • created_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP                     │
+   │ • updated_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE           │
+   │                                                                         │
+   │ 21 items across 6 categories with Indian Rupee pricing                 │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+6. ORDERS (Transaction Records)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ ORDERS                                                                  │
+   │ ─────────────────────────────────────────────────────────────────────── │
+   │ • id (PK) - INT AUTO_INCREMENT                                          │
+   │ • user_id (FK) - INT NOT NULL → USERS.id                               │
+   │ • order_number (UK) - VARCHAR(20) UNIQUE                               │
+   │ • subtotal - DECIMAL(10,2) NOT NULL                                    │
+   │ • tax_amount - DECIMAL(10,2) DEFAULT 0.00                              │
+   │ • total_amount - DECIMAL(10,2) NOT NULL                                │
+   │ • status - ENUM('pending', 'confirmed', 'preparing', 'ready',          │
+   │           'delivered', 'cancelled') DEFAULT 'pending'                  │
+   │ • payment_method - ENUM('cash', 'card', 'upi', 'wallet')               │
+   │ • payment_status - ENUM('pending', 'paid', 'failed', 'refunded')       │
+   │ • delivery_address - TEXT                                              │
+   │ • special_instructions - TEXT                                          │
+   │ • notes - TEXT                                                         │
+   │ • estimated_delivery - TIMESTAMP NULL                                  │
+   │ • delivered_at - TIMESTAMP NULL                                        │
+   │ • created_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP                     │
+   │ • updated_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE           │
+   │                                                                         │
+   │ Complete order lifecycle management                                     │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+7. ORDER_ITEMS (Order Line Items)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ ORDER_ITEMS                                                             │
+   │ ─────────────────────────────────────────────────────────────────────── │
+   │ • id (PK) - INT AUTO_INCREMENT                                          │
+   │ • order_id (FK) - INT NOT NULL → ORDERS.id                             │
+   │ • menu_item_id (FK) - INT NOT NULL → MENU_ITEMS.id                     │
+   │ • quantity - INT NOT NULL DEFAULT 1                                    │
+   │ • price - DECIMAL(8,2) NOT NULL                                        │
+   │ • subtotal - DECIMAL(10,2) GENERATED AS (quantity * price) STORED      │
+   │ • special_requests - TEXT                                              │
+   │ • created_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP                     │
+   │                                                                         │
+   │ Computed subtotal for automatic calculation                             │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+8. CART (Shopping Cart)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ CART                                                                    │
+   │ ─────────────────────────────────────────────────────────────────────── │
+   │ • id (PK) - INT AUTO_INCREMENT                                          │
+   │ • user_id (FK) - INT NOT NULL → USERS.id                               │
+   │ • menu_item_id (FK) - INT NOT NULL → MENU_ITEMS.id                     │
+   │ • quantity - INT NOT NULL DEFAULT 1                                    │
+   │ • created_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP                     │
+   │ • updated_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE           │
+   │                                                                         │
+   │ UNIQUE KEY: unique_user_item (user_id, menu_item_id)                   │
+   │ Temporary storage before order placement                                │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+9. AUDIT_LOG (System Audit Trail)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ AUDIT_LOG                                                               │
+   │ ─────────────────────────────────────────────────────────────────────── │
+   │ • id (PK) - INT AUTO_INCREMENT                                          │
+   │ • table_name - VARCHAR(50) NOT NULL                                    │
+   │ • operation - ENUM('INSERT', 'UPDATE', 'DELETE') NOT NULL              │
+   │ • record_id - INT NOT NULL                                             │
+   │ • old_values - JSON                                                    │
+   │ • new_values - JSON                                                    │
+   │ • user_id (FK) - INT → USERS.id                                        │
+   │ • timestamp - TIMESTAMP DEFAULT CURRENT_TIMESTAMP                      │
+   │                                                                         │
+   │ Automatic audit trail via triggers                                     │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+10. INVENTORY_LOG (Stock Movement Tracking)
+    ┌─────────────────────────────────────────────────────────────────────────┐
+    │ INVENTORY_LOG                                                           │
+    │ ─────────────────────────────────────────────────────────────────────── │
+    │ • id (PK) - INT AUTO_INCREMENT                                          │
+    │ • menu_item_id (FK) - INT NOT NULL → MENU_ITEMS.id                     │
+    │ • change_type - ENUM('order_placed', 'order_cancelled',                │
+    │                'manual_adjustment') NOT NULL                           │
+    │ • quantity_change - INT NOT NULL                                       │
+    │ • reference_id - INT                                                   │
+    │ • notes - TEXT                                                         │
+    │ • created_at - TIMESTAMP DEFAULT CURRENT_TIMESTAMP                     │
+    │                                                                         │
+    │ Automatic inventory tracking via triggers                              │
+    └─────────────────────────────────────────────────────────────────────────┘
+
+RELATIONSHIPS
+================================================================================
+
+PRIMARY RELATIONSHIPS:
+
+1. USERS → USER_PROFILES (1:1)
+   - Each user has exactly one profile
+   - Auto-created via trigger
+   - CASCADE DELETE
+
+2. USERS → ADDRESSES (1:Many)
+   - Users can have multiple addresses
+   - One default address per user
+   - CASCADE DELETE
+
+3. USERS → ORDERS (1:Many)
+   - Users can place multiple orders
+   - CASCADE DELETE
+
+4. USERS → CART (1:Many)
+   - Users can have multiple cart items
+   - CASCADE DELETE
+
+5. CATEGORIES → MENU_ITEMS (1:Many)
+   - Categories contain multiple menu items
+   - SET NULL on category deletion
+
+6. ORDERS → ORDER_ITEMS (1:Many)
+   - Orders contain multiple line items
+   - CASCADE DELETE
+
+7. MENU_ITEMS → ORDER_ITEMS (1:Many)
+   - Menu items can be in multiple orders
+   - CASCADE DELETE
+
+8. MENU_ITEMS → CART (1:Many)
+   - Menu items can be in multiple carts
+   - CASCADE DELETE
+
+AUDIT & TRACKING RELATIONSHIPS:
+
+9. USERS → AUDIT_LOG (1:Many)
+   - Track user activities
+   - SET NULL on user deletion
+
+10. MENU_ITEMS → INVENTORY_LOG (1:Many)
+    - Track inventory changes
+    - CASCADE DELETE
+
+RELATIONSHIP CARDINALITIES:
+================================================================================
+
+USERS (1) ←→ (1) USER_PROFILES
+USERS (1) ←→ (0..n) ADDRESSES
+USERS (1) ←→ (0..n) ORDERS
+USERS (1) ←→ (0..n) CART
+USERS (1) ←→ (0..n) AUDIT_LOG
+
+CATEGORIES (1) ←→ (0..n) MENU_ITEMS
+
+MENU_ITEMS (1) ←→ (0..n) ORDER_ITEMS
+MENU_ITEMS (1) ←→ (0..n) CART
+MENU_ITEMS (1) ←→ (0..n) INVENTORY_LOG
+
+ORDERS (1) ←→ (1..n) ORDER_ITEMS
+
+BUSINESS RULES ENFORCED:
+================================================================================
+
+1. Data Integrity:
+   - All foreign keys enforced
+   - Unique constraints on usernames, emails, order numbers
+   - NOT NULL constraints on essential fields
+
+2. Business Logic:
+   - User profiles auto-created via triggers
+   - Inventory automatically tracked via triggers
+   - Order changes audited automatically
+
+3. Data Validation:
+   - Enum constraints for status fields
+   - Price and quantity must be positive
+   - Email format validation at application level
+
+4. Security:
+   - Password hashing enforced
+   - Admin privileges controlled
+   - Audit trail for compliance
+
+NORMALIZATION LEVEL:
+================================================================================
+
+The database follows Third Normal Form (3NF):
+- 1NF: All attributes are atomic
+- 2NF: No partial dependencies
+- 3NF: No transitive dependencies
+
+Key normalization decisions:
+- User addresses separated into ADDRESSES table
+- User profile data separated into USER_PROFILES table
+- Order items normalized into separate table
+- Categories separated from menu items
+
+This design eliminates data redundancy while maintaining referential integrity
+and supporting efficient queries for the coffee shop business operations.
+
+================================================================================
+                                END OF ER DIAGRAM
+================================================================================

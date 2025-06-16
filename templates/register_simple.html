@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Simple Register - Afforgato Cafe{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="container">
+        <div class="form-container">
+            <div class="glass-form">
+                <div class="text-center mb-4">
+                    <h2 class="mb-3">Simple Registration Test</h2>
+                    <p class="text-muted">Basic form to test registration</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('register') }}">
+                    <div class="mb-3">
+                        <label for="first_name" class="form-label">First Name</label>
+                        <input type="text" 
+                               class="form-control glass-input" 
+                               id="first_name" 
+                               name="first_name" 
+                               value="Test"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="last_name" class="form-label">Last Name</label>
+                        <input type="text" 
+                               class="form-control glass-input" 
+                               id="last_name" 
+                               name="last_name" 
+                               value="User"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" 
+                               class="form-control glass-input" 
+                               id="username" 
+                               name="username" 
+                               value="testuser456"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" 
+                               class="form-control glass-input" 
+                               id="email" 
+                               name="email" 
+                               value="test456@example.com"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" 
+                               class="form-control glass-input" 
+                               id="password" 
+                               name="password" 
+                               value="testpass123"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone (Optional)</label>
+                        <input type="tel" 
+                               class="form-control glass-input" 
+                               id="phone" 
+                               name="phone" 
+                               value="+91 98765 43210">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="address" class="form-label">Address (Optional)</label>
+                        <textarea class="form-control glass-input" 
+                                  id="address" 
+                                  name="address" 
+                                  rows="2">Test Address, Bengaluru</textarea>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="glass-btn">
+                            Create Account
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="mb-0">
+                            <a href="{{ url_for('register') }}" class="text-brown">
+                                Back to Full Registration Form
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    console.log('Simple registration form loaded');
+    
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        console.log('Simple form submitted!');
+        const btn = this.querySelector('button[type="submit"]');
+        btn.innerHTML = 'Creating...';
+        btn.disabled = true;
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Order - #{{ order.id }} - Afforgato Cafe Admin ☕{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0 admin-title">
+                    <span class="admin-icon">✏️</span>
+                    Edit Order - #{{ order.id }}
+                </h1>
+                <div class="admin-actions">
+                    <a href="{{ url_for('admin_view_order', order_id=order.id) }}" class="glass-btn-secondary me-2">
+                        ← Back to Order
+                    </a>
+                    <a href="{{ url_for('admin_orders') }}" class="glass-btn-secondary">
+                        📦 All Orders
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="glass-card">
+                <h5 class="card-title">📦 Order Information</h5>
+                
+                <form method="POST" class="admin-form">
+                    <div class="row g-4">
+                        <!-- Order Status -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Order Status</label>
+                                <select class="glass-input" name="status" required>
+                                    <option value="pending" {{ 'selected' if order.status == 'pending' else '' }}>⏳ Pending</option>
+                                    <option value="confirmed" {{ 'selected' if order.status == 'confirmed' else '' }}>✅ Confirmed</option>
+                                    <option value="preparing" {{ 'selected' if order.status == 'preparing' else '' }}>👨‍🍳 Preparing</option>
+                                    <option value="ready" {{ 'selected' if order.status == 'ready' else '' }}>🔔 Ready</option>
+                                    <option value="delivered" {{ 'selected' if order.status == 'delivered' else '' }}>📦 Delivered</option>
+                                    <option value="cancelled" {{ 'selected' if order.status == 'cancelled' else '' }}>❌ Cancelled</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Status -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Payment Status</label>
+                                <select class="glass-input" name="payment_status" required>
+                                    <option value="pending" {{ 'selected' if order.payment_status == 'pending' else '' }}>⏳ Pending</option>
+                                    <option value="paid" {{ 'selected' if order.payment_status == 'paid' else '' }}>💳 Paid</option>
+                                    <option value="failed" {{ 'selected' if order.payment_status == 'failed' else '' }}>❌ Failed</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Order ID (Read-only) -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Order ID</label>
+                                <input type="text" class="glass-input" value="#{{ order.id }}" readonly disabled>
+                            </div>
+                        </div>
+                        
+                        <!-- Customer (Read-only) -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Customer</label>
+                                <input type="text" class="glass-input" value="{{ order.user.full_name }}" readonly disabled>
+                            </div>
+                        </div>
+                        
+                        <!-- Total Amount (Read-only) -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Total Amount</label>
+                                <input type="text" class="glass-input" value="₹{{ '%.0f'|format(order.total_amount) }}" readonly disabled>
+                            </div>
+                        </div>
+                        
+                        <!-- Order Date (Read-only) -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Order Date</label>
+                                <input type="text" class="glass-input" value="{{ order.created_at.strftime('%B %d, %Y at %I:%M %p') }}" readonly disabled>
+                            </div>
+                        </div>
+                        
+                        <!-- Delivery Address -->
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">Delivery Address</label>
+                                <textarea class="glass-input" name="delivery_address" rows="3" 
+                                          placeholder="Enter delivery address">{{ order.delivery_address or '' }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Special Instructions -->
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">Special Instructions</label>
+                                <textarea class="glass-input" name="special_instructions" rows="2" 
+                                          placeholder="Any special instructions from customer">{{ order.special_instructions or '' }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Admin Notes -->
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">Admin Notes</label>
+                                <textarea class="glass-input" name="notes" rows="3" 
+                                          placeholder="Internal notes for this order (not visible to customer)">{{ order.notes or '' }}</textarea>
+                                <small class="form-text text-muted">These notes are only visible to admin users</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Order Items (Read-only) -->
+                    <div class="order-items-section mt-4">
+                        <h6 class="mb-3">🛒 Order Items</h6>
+                        <div class="order-items-list">
+                            {% for item in order.order_items %}
+                            <div class="order-item-readonly">
+                                <div class="item-info">
+                                    <span class="item-emoji">{{ item.menu_item.emoji }}</span>
+                                    <div class="item-details">
+                                        <h6>{{ item.menu_item.name }}</h6>
+                                        <small>₹{{ "%.0f"|format(item.menu_item.price) }} × {{ item.quantity }}</small>
+                                    </div>
+                                </div>
+                                <div class="item-total">
+                                    <strong>₹{{ "%.0f"|format(item.subtotal) }}</strong>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Order Summary -->
+                        <div class="order-summary-readonly">
+                            {% set subtotal = order.total_amount / 1.18 %}
+                            {% set gst_amount = order.total_amount - subtotal %}
+                            
+                            <div class="summary-row">
+                                <span>Subtotal:</span>
+                                <span>₹{{ "%.0f"|format(subtotal) }}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>GST (18%):</span>
+                                <span>₹{{ "%.0f"|format(gst_amount) }}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Delivery Fee:</span>
+                                <span>FREE</span>
+                            </div>
+                            <div class="summary-row total-row">
+                                <strong>Total Amount:</strong>
+                                <strong>₹{{ "%.0f"|format(order.total_amount) }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Actions -->
+                    <div class="form-actions mt-4">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="{{ url_for('admin_view_order', order_id=order.id) }}" 
+                                   class="glass-btn-secondary">
+                                    ← Cancel
+                                </a>
+                            </div>
+                            <div>
+                                <button type="submit" class="glass-btn">
+                                    💾 Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    .admin-form .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .admin-form .form-label {
+        font-weight: 600;
+        color: var(--brown-primary);
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .admin-form .glass-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid rgba(139, 69, 19, 0.3);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease;
+    }
+    
+    .admin-form .glass-input:focus {
+        border-color: var(--brown-primary);
+        box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25);
+        outline: none;
+    }
+    
+    .admin-form .glass-input:disabled {
+        background: rgba(248, 249, 250, 0.8);
+        color: #6c757d;
+    }
+    
+    .order-items-section {
+        background: rgba(248, 249, 250, 0.8);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(139, 69, 19, 0.1);
+    }
+    
+    .order-item-readonly {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        border: 1px solid rgba(139, 69, 19, 0.1);
+        border-radius: 6px;
+        margin-bottom: 8px;
+        background: rgba(255, 255, 255, 0.7);
+    }
+    
+    .item-info {
+        display: flex;
+        align-items: center;
+    }
+    
+    .item-emoji {
+        font-size: 20px;
+        margin-right: 12px;
+    }
+    
+    .item-details h6 {
+        margin: 0 0 4px 0;
+        color: var(--brown-primary);
+    }
+    
+    .item-details small {
+        color: #666;
+    }
+    
+    .item-total {
+        color: var(--brown-primary);
+        font-weight: 600;
+    }
+    
+    .order-summary-readonly {
+        border-top: 1px solid rgba(139, 69, 19, 0.2);
+        padding-top: 15px;
+        margin-top: 15px;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+    }
+    
+    .total-row {
+        border-top: 1px solid rgba(139, 69, 19, 0.2);
+        padding-top: 12px;
+        margin-top: 8px;
+        font-size: 16px;
+        color: var(--brown-primary);
+    }
+    
+    .form-actions {
+        border-top: 1px solid rgba(139, 69, 19, 0.1);
+        padding-top: 20px;
+    }
+    
+    .form-text {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    
+    /* Status-based styling */
+    select[name="status"] option[value="pending"] { color: #856404; }
+    select[name="status"] option[value="confirmed"] { color: #0c5460; }
+    select[name="status"] option[value="preparing"] { color: #721c24; }
+    select[name="status"] option[value="ready"] { color: #155724; }
+    select[name="status"] option[value="delivered"] { color: #0c5460; }
+    select[name="status"] option[value="cancelled"] { color: #721c24; }
+    
+    select[name="payment_status"] option[value="pending"] { color: #856404; }
+    select[name="payment_status"] option[value="paid"] { color: #155724; }
+    select[name="payment_status"] option[value="failed"] { color: #721c24; }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .admin-form .row.g-4 {
+            gap: 1rem;
+        }
+        
+        .form-actions .d-flex {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .form-actions .glass-btn,
+        .form-actions .glass-btn-secondary {
+            width: 100%;
+        }
+        
+        .order-items-section {
+            padding: 15px;
+        }
+        
+        .order-item-readonly {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        
+        .item-total {
+            align-self: flex-end;
+        }
+    }
+</style>
+
+<script>
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const status = document.querySelector('select[name="status"]').value;
+        const paymentStatus = document.querySelector('select[name="payment_status"]').value;
+        
+        if (!status || !paymentStatus) {
+            e.preventDefault();
+            alert('Please select both order status and payment status');
+            return;
+        }
+        
+        // Validation: Can't mark as delivered if payment is not paid
+        if (status === 'delivered' && paymentStatus !== 'paid') {
+            if (!confirm('Order is marked as delivered but payment is not marked as paid. Continue anyway?')) {
+                e.preventDefault();
+                return;
+            }
+        }
+        
+        // Validation: Can't mark payment as paid if order is cancelled
+        if (status === 'cancelled' && paymentStatus === 'paid') {
+            if (!confirm('Order is cancelled but payment is marked as paid. Continue anyway?')) {
+                e.preventDefault();
+                return;
+            }
+        }
+    });
+    
+    // Status change warnings
+    const statusSelect = document.querySelector('select[name="status"]');
+    const paymentSelect = document.querySelector('select[name="payment_status"]');
+    
+    statusSelect.addEventListener('change', function() {
+        if (this.value === 'cancelled') {
+            if (!confirm('Are you sure you want to cancel this order? This action should be carefully considered.')) {
+                this.value = '{{ order.status }}'; // Reset to original value
+            }
+        }
+    });
+    
+    paymentSelect.addEventListener('change', function() {
+        if (this.value === 'failed') {
+            if (!confirm('Are you sure you want to mark payment as failed? This will require follow-up action.')) {
+                this.value = '{{ order.payment_status }}'; // Reset to original value
+            }
+        }
+    });
+</script>
+{% endblock %}

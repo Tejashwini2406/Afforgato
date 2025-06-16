@@ -1,0 +1,1062 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - Afforgato Cafe ☕{% endblock %}
+
+{% block content %}
+<div class="checkout-page">
+    <div class="container-fluid">
+        <!-- Header Section -->
+        <div class="checkout-header">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="checkout-title">
+                        <span class="checkout-icon">💳</span>
+                        Secure Checkout
+                    </h1>
+                    <p class="checkout-subtitle">Complete your order in just a few steps</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="{{ url_for('cart') }}" class="glass-btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Cart
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Checkout Form -->
+        <form method="POST" action="{{ url_for('checkout') }}" id="checkoutForm" class="checkout-form">
+            <div class="row g-4">
+                <!-- Left Column - Form Details -->
+                <div class="col-xl-8 col-lg-7">
+                    <!-- Customer Information -->
+                    <div style="background: white; border-radius: 12px; padding: 0.5rem; margin-bottom: 0.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 1px solid rgba(139, 69, 19, 0.1);">
+                        <h5 style="color: #8B4513; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(139, 69, 19, 0.1);">👤 Customer Information</h5>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" class="glass-input" value="{{ current_user.first_name }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" class="glass-input" value="{{ current_user.last_name }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Email Address</label>
+                                    <input type="email" class="glass-input" value="{{ current_user.email }}" readonly>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="glass-input" value="{{ current_user.phone or '+91 98765 43210' }}" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Information -->
+                    <div style="background: white; border-radius: 12px; padding: 0.5rem; margin-bottom: 0.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 1px solid rgba(139, 69, 19, 0.1);">
+                        <h5 style="color: #8B4513; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(139, 69, 19, 0.1);">🚚 Delivery Information</h5>
+                        <div class="form-group" style="margin-bottom: 0.75rem;">
+                            <label class="form-label">Delivery Address</label>
+                            <textarea style="background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 0.75rem 1rem; font-size: 1rem; width: 100%; min-height: 60px; resize: vertical;"
+                                      name="delivery_address"
+                                      rows="2"
+                                      placeholder="Enter your complete delivery address in Bengaluru">{{ current_user.address or 'Bengaluru, Karnataka, India' }}</textarea>
+                            <div class="form-text text-muted mt-1">
+                                <small><i class="fas fa-info-circle me-1"></i>We deliver across Bengaluru</small>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Delivery Time</label>
+                                    <select class="glass-input" name="delivery_time">
+                                        <option value="asap">ASAP (15-20 mins)</option>
+                                        <option value="30min">30 minutes</option>
+                                        <option value="1hour">1 hour</option>
+                                        <option value="2hour">2 hours</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">Special Instructions</label>
+                                    <input type="text"
+                                           class="glass-input"
+                                           name="special_instructions"
+                                           placeholder="Ring doorbell, leave at door, etc.">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div style="background: white; border-radius: 12px; padding: 0.5rem; margin-bottom: 0.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 1px solid rgba(139, 69, 19, 0.1);">
+                        <h5 style="color: #8B4513; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(139, 69, 19, 0.1);">💳 Payment Method</h5>
+                        <div class="row g-2 mb-3">
+                            <div class="col-6 col-lg-3">
+                                <div class="payment-option">
+                                    <input type="radio" class="btn-check" name="payment_method" id="upi" value="upi" checked>
+                                    <label class="btn glass-btn-secondary w-100" for="upi">
+                                        <div class="text-center">
+                                            <div class="fs-5 mb-1">📱</div>
+                                            <div class="fw-medium">UPI</div>
+                                            <small class="text-muted">Instant</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <div class="payment-option">
+                                    <input type="radio" class="btn-check" name="payment_method" id="credit_card" value="credit_card">
+                                    <label class="btn glass-btn-secondary w-100" for="credit_card">
+                                        <div class="text-center">
+                                            <div class="fs-5 mb-1">💳</div>
+                                            <div class="fw-medium">Card</div>
+                                            <small class="text-muted">Visa/MC</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <div class="payment-option">
+                                    <input type="radio" class="btn-check" name="payment_method" id="net_banking" value="net_banking">
+                                    <label class="btn glass-btn-secondary w-100" for="net_banking">
+                                        <div class="text-center">
+                                            <div class="fs-5 mb-1">🏦</div>
+                                            <div class="fw-medium">Banking</div>
+                                            <small class="text-muted">Net Bank</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3">
+                                <div class="payment-option">
+                                    <input type="radio" class="btn-check" name="payment_method" id="cash" value="cash">
+                                    <label class="btn glass-btn-secondary w-100" for="cash">
+                                        <div class="text-center">
+                                            <div class="fs-5 mb-1">💵</div>
+                                            <div class="fw-medium">Cash</div>
+                                            <small class="text-muted">On Delivery</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Details -->
+                        <div class="payment-details-container">
+                            <!-- UPI Details -->
+                            <div id="upi-details" class="payment-details-section">
+                                <div class="alert alert-info border-0" style="background: rgba(139, 69, 19, 0.1); margin-bottom: 0;">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label fw-medium">UPI ID</label>
+                                            <input type="text"
+                                                   class="glass-input"
+                                                   placeholder="yourname@paytm / yourname@phonepe / yourname@gpay"
+                                                   name="upi_id">
+                                            <div class="form-text text-muted mt-2">
+                                                <i class="fas fa-shield-alt me-1"></i>Enter your UPI ID for instant payment
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Credit Card Details -->
+                            <div id="card-details" class="payment-details-section" style="display: none;">
+                                <div class="alert alert-info border-0" style="background: rgba(139, 69, 19, 0.1); margin-bottom: 0;">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label fw-medium">Card Number</label>
+                                            <input type="text"
+                                                   class="glass-input"
+                                                   placeholder="1234 5678 9012 3456"
+                                                   maxlength="19"
+                                                   name="card_number">
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="form-label fw-medium">Expiry Date</label>
+                                            <input type="text"
+                                                   class="glass-input"
+                                                   placeholder="MM/YY"
+                                                   maxlength="5"
+                                                   name="expiry_date">
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="form-label fw-medium">CVV</label>
+                                            <input type="text"
+                                                   class="glass-input"
+                                                   placeholder="123"
+                                                   maxlength="4"
+                                                   name="cvv">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label fw-medium">Cardholder Name</label>
+                                            <input type="text"
+                                                   class="glass-input"
+                                                   placeholder="{{ current_user.first_name }} {{ current_user.last_name }}"
+                                                   name="cardholder_name">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Net Banking Details -->
+                            <div id="netbanking-details" class="payment-details-section" style="display: none;">
+                                <div class="alert alert-info border-0" style="background: rgba(139, 69, 19, 0.1); margin-bottom: 0;">
+                                    <div class="row g-3">
+                                        <div class="col-12">
+                                            <label class="form-label fw-medium">Select Your Bank</label>
+                                            <select class="glass-input" name="bank_name">
+                                                <option value="">Choose your bank</option>
+                                                <option value="sbi">State Bank of India (SBI)</option>
+                                                <option value="hdfc">HDFC Bank</option>
+                                                <option value="icici">ICICI Bank</option>
+                                                <option value="axis">Axis Bank</option>
+                                                <option value="kotak">Kotak Mahindra Bank</option>
+                                                <option value="pnb">Punjab National Bank (PNB)</option>
+                                                <option value="canara">Canara Bank</option>
+                                                <option value="bob">Bank of Baroda</option>
+                                                <option value="other">Other Bank</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Notes -->
+                    <div style="background: white; border-radius: 12px; padding: 0.5rem; margin-bottom: 0.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 1px solid rgba(139, 69, 19, 0.1);">
+                        <h5 style="color: #8B4513; font-weight: 700; font-size: 1.1rem; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(139, 69, 19, 0.1);">📝 Order Notes</h5>
+                        <textarea style="background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 0.75rem 1rem; font-size: 1rem; width: 100%; min-height: 60px; resize: vertical;"
+                                  name="notes"
+                                  rows="2"
+                                  placeholder="Any special requests, dietary restrictions, or notes for your order..."></textarea>
+                        <div class="form-text text-muted mt-1">
+                            <small><i class="fas fa-info-circle me-1"></i>Let us know if you have any special requirements</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Order Summary -->
+                <div class="col-xl-4 col-lg-5">
+                    <div class="order-summary-card" style="padding: 1rem; border-radius: 8px;">
+                        <div class="order-summary-header" style="margin-bottom: 1rem; padding-bottom: 0.5rem;">
+                            <h3 class="order-summary-title" style="font-size: 1.1rem; margin: 0;">
+                                <span class="summary-icon">📋</span>
+                                Order Summary
+                            </h3>
+                        </div>
+
+                        <!-- Items List -->
+                        <div class="order-items-list mb-3">
+                            {% for item in cart_items %}
+                            <div class="order-item d-flex justify-content-between align-items-center mb-2 p-2 rounded"
+                                 style="background: #f8f9fa; border: 1px solid #e9ecef; font-size: 0.9rem;">
+                                <div class="item-details flex-grow-1">
+                                    <div class="d-flex align-items-center">
+                                        <span class="me-2" style="font-size: 1.2rem;">{{ item.menu_item.emoji or '☕' }}</span>
+                                        <div>
+                                            <div class="fw-bold text-brown" style="font-size: 0.9rem;">{{ item.menu_item.name }}</div>
+                                            <small class="text-muted" style="font-size: 0.8rem;">
+                                                Qty: {{ item.quantity }} × ₹{{ "%.0f"|format(item.menu_item.price) }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item-price text-end">
+                                    <div class="fw-bold text-brown" style="font-size: 0.95rem;">₹{{ "%.0f"|format(item.subtotal) }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Pricing Breakdown -->
+                        <div class="pricing-breakdown">
+                            {% set subtotal = total|float %}
+                            {% set gst_amount = subtotal * 0.18 %}
+                            {% set delivery_fee = 50 if subtotal < 500 else 0 %}
+                            {% set final_total = subtotal + gst_amount + delivery_fee %}
+
+                            <div class="pricing-section p-2 rounded" style="background: #f8f9fa; border: 1px solid #e9ecef; font-size: 0.9rem;">
+                                <div class="pricing-row d-flex justify-content-between align-items-center py-1"
+                                    <span class="pricing-label">Subtotal:</span>
+                                    <span class="pricing-value fw-medium">₹{{ "%.0f"|format(subtotal) }}</span>
+                                </div>
+
+                                <div class="pricing-row d-flex justify-content-between align-items-center py-1">
+                                    <span class="pricing-label">
+                                        GST (18%):
+                                        <small class="text-muted d-block" style="font-size: 0.75rem;">Goods & Services Tax</small>
+                                    </span>
+                                    <span class="pricing-value fw-medium">₹{{ "%.0f"|format(gst_amount) }}</span>
+                                </div>
+
+                                <div class="pricing-row d-flex justify-content-between align-items-center py-1">
+                                    <span class="pricing-label">
+                                        Delivery Fee:
+                                        {% if delivery_fee == 0 %}
+                                            <small class="text-success d-block" style="font-size: 0.75rem;">Free delivery over ₹500</small>
+                                        {% else %}
+                                            <small class="text-muted d-block" style="font-size: 0.75rem;">Standard delivery</small>
+                                        {% endif %}
+                                    </span>
+                                    <span class="pricing-value fw-medium">
+                                        {% if delivery_fee == 0 %}
+                                            <span class="text-success fw-bold">FREE</span>
+                                        {% else %}
+                                            ₹{{ "%.0f"|format(delivery_fee) }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+
+                                <hr class="my-2" style="border-color: rgba(139, 69, 19, 0.3);">
+
+                                <div class="pricing-row d-flex justify-content-between align-items-center py-1">
+                                    <strong class="pricing-label text-brown" style="font-size: 1rem;">Total Amount:</strong>
+                                    <strong class="pricing-value text-brown" style="font-size: 1.2rem;">
+                                        ₹{{ "%.0f"|format(final_total) }}
+                                    </strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Information -->
+                        <div class="delivery-info mt-3 p-2 rounded" style="background: rgba(139, 69, 19, 0.1); border: 1px solid rgba(139, 69, 19, 0.2); font-size: 0.9rem;">
+                            <div class="text-center">
+                                <div class="delivery-icon mb-1">
+                                    <i class="fas fa-clock text-brown" style="font-size: 1.2rem;"></i>
+                                </div>
+                                <div class="delivery-text">
+                                    <strong class="text-brown" style="font-size: 0.95rem;">⏰ Estimated Delivery</strong>
+                                    <div class="mt-1">
+                                        <span class="badge px-2 py-1" style="background: var(--brown-primary); color: white; font-size: 0.8rem;">
+                                            15-20 minutes
+                                        </span>
+                                    </div>
+                                    <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                                        <i class="fas fa-map-marker-alt me-1"></i>Delivery across Bengaluru
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons mt-3">
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="glass-btn py-2" id="placeOrderBtn" style="font-size: 0.95rem;">
+                                    <i class="fas fa-rocket me-2"></i>
+                                    🚀 Place Order - ₹{{ "%.0f"|format(final_total) }}
+                                </button>
+                                <a href="{{ url_for('cart') }}" class="glass-btn-secondary py-2" style="font-size: 0.9rem;">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    ← Modify Cart
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Security Badge -->
+                        <div class="security-info mt-2 text-center">
+                            <small class="text-muted" style="font-size: 0.75rem;">
+                                <i class="fas fa-shield-alt me-1"></i>
+                                Secure payment powered by industry standards
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    /* Professional Checkout Page Styles */
+    .checkout-page {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: calc(100vh - 200px);
+        padding: 1rem 0 3rem 0;
+    }
+
+    .container-fluid {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    /* Header Styles */
+    .checkout-header {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        border: 1px solid rgba(139, 69, 19, 0.1);
+    }
+
+    .checkout-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--brown-primary);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .checkout-icon {
+        font-size: 1.8rem;
+    }
+
+    .checkout-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    /* Form Styles */
+    .checkout-form {
+        margin-top: 1rem;
+    }
+
+    .glass-card {
+        background: white !important;
+        border-radius: 12px !important;
+        padding: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06) !important;
+        border: 1px solid rgba(139, 69, 19, 0.1) !important;
+        transition: all 0.3s ease !important;
+    }
+
+    .glass-card:hover {
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        transform: translateY(-1px);
+    }
+
+    .card-title {
+        color: var(--brown-primary) !important;
+        font-weight: 700 !important;
+        font-size: 1.1rem !important;
+        margin-bottom: 0.25rem !important;
+        padding-bottom: 0.25rem !important;
+        border-bottom: 1px solid rgba(139, 69, 19, 0.1) !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.5rem !important;
+    }
+
+    .form-label {
+        color: var(--text-primary) !important;
+        font-weight: 600 !important;
+        margin-bottom: 0.25rem !important;
+        font-size: 0.95rem !important;
+    }
+
+    .glass-input {
+        background: #f8f9fa !important;
+        border: 2px solid #e9ecef !important;
+        border-radius: 12px !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 1rem !important;
+        transition: all 0.3s ease !important;
+        width: 100% !important;
+        font-weight: 500 !important;
+    }
+
+    .glass-input:focus {
+        border-color: var(--brown-primary);
+        box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.15);
+        background: white;
+        outline: none;
+        transform: translateY(-1px);
+    }
+
+    .glass-input:read-only {
+        background: #f1f3f4;
+        color: var(--text-muted);
+    }
+
+    textarea.glass-input {
+        min-height: 60px !important;
+        resize: vertical !important;
+        line-height: 1.6 !important;
+    }
+
+    /* Payment Options */
+    .payment-option .btn {
+        border: 2px solid #e9ecef !important;
+        background: #f8f9fa !important;
+        transition: all 0.3s ease !important;
+        height: 60px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0.5rem !important;
+        border-radius: 12px !important;
+        font-size: 0.9rem !important;
+        width: 100% !important;
+        font-weight: 600 !important;
+    }
+
+    .payment-option .btn:hover {
+        border-color: var(--brown-primary);
+        background: white;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(139, 69, 19, 0.15);
+    }
+
+    .payment-option .btn-check:checked + .btn {
+        background: var(--brown-primary);
+        border-color: var(--brown-primary);
+        color: white;
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+    }
+
+    /* Order Summary Card */
+    .order-summary-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        border: 1px solid rgba(139, 69, 19, 0.1);
+        position: sticky;
+        top: 1rem;
+        max-height: calc(100vh - 2rem);
+        overflow-y: auto;
+    }
+
+    .order-summary-header {
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+    }
+
+    .order-summary-title {
+        color: var(--brown-primary);
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .summary-icon {
+        font-size: 1.2rem;
+    }
+
+    /* Order Items */
+    .order-items-list {
+        margin-bottom: 1.25rem;
+    }
+
+    .order-item {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .order-item:hover {
+        background: white;
+        border-color: var(--brown-primary);
+        transform: translateX(3px);
+        box-shadow: 0 2px 8px rgba(139, 69, 19, 0.1);
+    }
+
+    .item-emoji {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .item-details {
+        flex-grow: 1;
+    }
+
+    .item-name {
+        font-weight: 700;
+        color: var(--brown-primary);
+        font-size: 0.95rem;
+        margin-bottom: 0.15rem;
+    }
+
+    .item-price {
+        font-weight: 700;
+        color: var(--brown-primary);
+        font-size: 1rem;
+    }
+
+    /* Pricing Breakdown */
+    .pricing-breakdown {
+        margin: 1.25rem 0;
+    }
+
+    .pricing-section {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 0.75rem 0;
+    }
+
+    .pricing-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        transition: all 0.3s ease;
+        border-radius: 6px;
+    }
+
+    .pricing-row:hover {
+        background: rgba(139, 69, 19, 0.05);
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+
+    .pricing-label {
+        font-weight: 500;
+        color: var(--text-primary);
+        font-size: 0.9rem;
+    }
+
+    .pricing-value {
+        font-weight: 700;
+        color: var(--brown-primary);
+        font-size: 1rem;
+    }
+
+    /* Delivery Info */
+    .delivery-info {
+        background: linear-gradient(135deg, rgba(139, 69, 19, 0.1) 0%, rgba(139, 69, 19, 0.05) 100%);
+        border: 1px solid rgba(139, 69, 19, 0.2);
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        margin: 1.25rem 0;
+    }
+
+    .delivery-icon {
+        margin-bottom: 0.5rem;
+    }
+
+    .delivery-text strong {
+        color: var(--brown-primary);
+        font-size: 1rem;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        margin-top: 1.25rem;
+    }
+
+    .glass-btn {
+        background: var(--brown-primary);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .glass-btn:hover {
+        background: var(--brown-secondary);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+    }
+
+    .glass-btn-secondary {
+        background: transparent;
+        border: 2px solid var(--brown-primary);
+        border-radius: 12px;
+        color: var(--brown-primary);
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .glass-btn-secondary:hover {
+        background: var(--brown-primary);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(139, 69, 19, 0.2);
+        text-decoration: none;
+    }
+
+    /* Security Info */
+    .security-info {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: rgba(139, 69, 19, 0.05);
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+        .container-fluid {
+            padding: 0 1rem;
+        }
+
+        .checkout-title {
+            font-size: 2rem;
+        }
+
+        .glass-card {
+            padding: 1.5rem;
+        }
+
+        .order-summary-card {
+            position: static;
+            margin-top: 2rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .checkout-header {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .checkout-title {
+            font-size: 1.75rem;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .glass-card {
+            padding: 1.25rem;
+        }
+
+        .payment-option .btn {
+            height: 80px;
+            font-size: 0.85rem;
+        }
+
+        .order-item {
+            padding: 1rem;
+        }
+
+        .item-emoji {
+            font-size: 1.5rem;
+        }
+    }
+
+    .action-buttons .glass-btn {
+        font-size: 16px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .action-buttons .glass-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(139, 69, 19, 0.3);
+    }
+
+    .payment-details-section {
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Form Groups */
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-label {
+        margin-bottom: 6px;
+        font-weight: 500;
+        color: var(--brown-primary);
+        font-size: 13px;
+        display: block;
+    }
+
+    .row.g-3 > * {
+        padding-bottom: 12px;
+    }
+
+    .row.g-4 > * {
+        padding-bottom: 16px;
+    }
+
+    /* Desktop specific fixes */
+    @media (min-width: 992px) {
+        .container {
+            max-width: 1200px !important;
+        }
+
+        .col-lg-8 {
+            flex: 0 0 66.666667%;
+            max-width: 66.666667%;
+        }
+
+        .col-lg-4 {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
+
+        .payment-option {
+            height: 100%;
+        }
+
+        .payment-option .btn {
+            height: 75px;
+            min-height: 75px;
+        }
+    }
+
+    /* Consistent Heights */
+    .col-sm-6, .col-md-6, .col-lg-3 {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .payment-option {
+        height: 100%;
+        display: flex;
+    }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        .glass-card {
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .payment-option .btn {
+            height: 80px;
+            font-size: 13px;
+        }
+
+        .order-item {
+            margin-bottom: 12px;
+            min-height: 60px;
+            padding: 16px;
+        }
+
+        .pricing-row {
+            padding: 10px 0;
+            min-height: 40px;
+        }
+
+        .glass-input {
+            height: 45px;
+        }
+
+        textarea.glass-input {
+            min-height: 90px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 13px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+    }
+
+    /* Print Styles */
+    @media print {
+        .action-buttons,
+        .glass-btn-secondary {
+            display: none;
+        }
+    }
+</style>
+
+<script>
+    // Payment method handling
+    document.querySelectorAll('input[name="payment_method"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const upiDetails = document.getElementById('upi-details');
+            const cardDetails = document.getElementById('card-details');
+            const netbankingDetails = document.getElementById('netbanking-details');
+
+            // Hide all payment details
+            upiDetails.style.display = 'none';
+            cardDetails.style.display = 'none';
+            netbankingDetails.style.display = 'none';
+
+            // Show relevant payment details
+            if (this.value === 'upi') {
+                upiDetails.style.display = 'block';
+            } else if (this.value === 'credit_card') {
+                cardDetails.style.display = 'block';
+            } else if (this.value === 'net_banking') {
+                netbankingDetails.style.display = 'block';
+            }
+        });
+    });
+
+    // Card number formatting
+    const cardNumberInput = document.querySelector('input[placeholder="1234 5678 9012 3456"]');
+    if (cardNumberInput) {
+        cardNumberInput.addEventListener('input', function() {
+            let value = this.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+            let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+            this.value = formattedValue;
+        });
+    }
+
+    // Expiry date formatting
+    const expiryInput = document.querySelector('input[placeholder="MM/YY"]');
+    if (expiryInput) {
+        expiryInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            this.value = value;
+        });
+    }
+
+    // Form submission
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const submitBtn = document.getElementById('placeOrderBtn');
+        const originalText = submitBtn.innerHTML;
+
+        // Validate payment method
+        const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+
+        // Validate based on payment method
+        if (paymentMethod === 'upi') {
+            const upiId = document.querySelector('input[name="upi_id"]').value;
+            if (!upiId) {
+                alert('❌ Please enter your UPI ID');
+                return;
+            }
+        } else if (paymentMethod === 'credit_card') {
+            const cardNumber = document.querySelector('input[name="card_number"]').value;
+            const expiry = document.querySelector('input[name="expiry_date"]').value;
+            const cvv = document.querySelector('input[name="cvv"]').value;
+            const cardholderName = document.querySelector('input[name="cardholder_name"]').value;
+
+            if (!cardNumber || !expiry || !cvv || !cardholderName) {
+                alert('❌ Please fill in all card details');
+                return;
+            }
+        } else if (paymentMethod === 'net_banking') {
+            const bankName = document.querySelector('select[name="bank_name"]').value;
+            if (!bankName) {
+                alert('❌ Please select your bank');
+                return;
+            }
+        }
+
+        // Show loading state
+        submitBtn.innerHTML = '⏳ Processing Order...';
+        submitBtn.disabled = true;
+
+        // Submit the form
+        setTimeout(() => {
+            this.submit();
+        }, 1000);
+    });
+
+    // Auto-fill demo card details
+    function fillDemoCard() {
+        document.querySelector('input[placeholder="1234 5678 9012 3456"]').value = '4532 1234 5678 9012';
+        document.querySelector('input[placeholder="MM/YY"]').value = '12/25';
+        document.querySelector('input[placeholder="123"]').value = '123';
+        document.querySelector('input[placeholder="John Doe"]').value = '{{ current_user.full_name }}';
+    }
+
+    // Add demo card button
+    const cardDetails = document.getElementById('card-details');
+    if (cardDetails) {
+        const demoBtn = document.createElement('button');
+        demoBtn.type = 'button';
+        demoBtn.className = 'glass-btn-secondary btn-sm mt-2';
+        demoBtn.innerHTML = '🎯 Use Demo Card';
+        demoBtn.onclick = fillDemoCard;
+        cardDetails.appendChild(demoBtn);
+    }
+
+    // Smooth animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+
+    // Payment option styling
+    const style = document.createElement('style');
+    style.textContent = `
+        .btn-check:checked + .btn {
+            background: rgba(139, 69, 19, 0.8) !important;
+            border-color: var(--brown-primary) !important;
+            color: white !important;
+        }
+        
+        .payment-option {
+            transition: all 0.3s ease;
+        }
+        
+        .payment-option:hover {
+            transform: translateY(-2px);
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

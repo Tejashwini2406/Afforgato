@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Afforgato Cafe ☕{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Header -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="mb-0">👨‍💼 Admin Dashboard</h2>
+                <div class="admin-actions">
+                    <a href="{{ url_for('index') }}" class="glass-btn-secondary">🏠 Back to Site</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-3">
+        <div class="col-lg-3 col-md-6">
+            <div class="admin-stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <h4>{{ total_users }}</h4>
+                    <p>Total Users</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="admin-stat-card">
+                <div class="stat-icon">📦</div>
+                <div class="stat-content">
+                    <h4>{{ total_orders }}</h4>
+                    <p>Total Orders</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="admin-stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-content">
+                    <h4>{{ pending_orders }}</h4>
+                    <p>Pending Orders</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+            <div class="admin-stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-content">
+                    <h4>₹{{ "%.0f"|format(total_revenue) }}</h4>
+                    <p>Total Revenue</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Orders -->
+        <div class="col-lg-8">
+            <div class="admin-content-card">
+                <div class="card-header">
+                    <h5>📋 Recent Orders</h5>
+                    <select class="form-select form-select-sm" style="width: 150px;" onchange="filterOrders(this.value)">
+                        <option value="all">All Orders</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="preparing">Preparing</option>
+                        <option value="ready">Ready</option>
+                        <option value="delivered">Delivered</option>
+                    </select>
+                </div>
+                <div class="card-body"
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr class="order-row" data-status="{{ order.status }}">
+                                <td>
+                                    <strong>#{{ order.id }}</strong>
+                                </td>
+                                <td>
+                                    <div class="customer-info">
+                                        <div>{{ order.user.full_name }}</div>
+                                        <small class="text-muted">{{ order.user.email }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="order-items-preview">
+                                        {% for item in order.order_items[:2] %}
+                                            <span class="badge bg-secondary me-1">
+                                                {{ item.menu_item.emoji or '☕' }} {{ item.quantity }}x
+                                            </span>
+                                        {% endfor %}
+                                        {% if order.order_items|length > 2 %}
+                                            <span class="badge bg-info">+{{ order.order_items|length - 2 }} more</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <strong class="text-brown">₹{{ "%.0f"|format(order.total_amount) }}</strong>
+                                </td>
+                                <td>
+                                    <select class="form-select form-select-sm status-select" 
+                                            onchange="updateOrderStatus({{ order.id }}, this.value)">
+                                        <option value="pending" {{ 'selected' if order.status == 'pending' else '' }}>⏳ Pending</option>
+                                        <option value="confirmed" {{ 'selected' if order.status == 'confirmed' else '' }}>✅ Confirmed</option>
+                                        <option value="preparing" {{ 'selected' if order.status == 'preparing' else '' }}>👨‍🍳 Preparing</option>
+                                        <option value="ready" {{ 'selected' if order.status == 'ready' else '' }}>🔔 Ready</option>
+                                        <option value="delivered" {{ 'selected' if order.status == 'delivered' else '' }}>📦 Delivered</option>
+                                        <option value="cancelled" {{ 'selected' if order.status == 'cancelled' else '' }}>❌ Cancelled</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ order.created_at.strftime('%m/%d %I:%M %p') }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-info btn-sm" onclick="viewOrderDetails({{ order.id }})">
+                                            👁️
+                                        </button>
+                                        <button class="btn btn-outline-warning btn-sm" onclick="editOrder({{ order.id }})">
+                                            ✏️
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="admin-sidebar-card mb-3">
+                <h6>⚡ Quick Actions</h6>
+                <div class="action-buttons">
+                    <a href="{{ url_for('admin_add_menu_item') }}" class="action-btn">➕ Add Menu Item</a>
+                    <a href="{{ url_for('admin_users') }}" class="action-btn">👥 Manage Users</a>
+                    <a href="{{ url_for('admin_menu') }}" class="action-btn">🍽️ Manage Menu</a>
+                    <a href="{{ url_for('admin_orders') }}" class="action-btn">📦 Manage Orders</a>
+                </div>
+            </div>
+
+            <!-- Today's Summary -->
+            <div class="admin-sidebar-card">
+                <h6>📅 Today's Summary</h6>
+                <div class="summary-stats">
+                    <div class="summary-row">
+                        <span>☕ Orders Today:</span>
+                        <strong>{{ recent_orders|length }}</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>💰 Revenue Today:</span>
+                        <strong>₹{{ "%.0f"|format(total_revenue|to_float * 0.1) }}</strong>
+                    </div>
+                    <div class="summary-row">
+                        <span>⭐ Avg Rating:</span>
+                        <strong>4.8/5</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Order Details Modal -->
+<div class="modal fade" id="orderDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content glass-card border-0">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title">📋 Order Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="orderDetailsContent">
+                <!-- Order details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Update order status
+    function updateOrderStatus(orderId, newStatus) {
+        if (confirm(`Update order #${orderId} status to ${newStatus}?`)) {
+            // Implement status update
+            fetch(`/admin/update_order_status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    order_id: orderId,
+                    status: newStatus
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(`✅ Order #${orderId} status updated to ${newStatus}`);
+                    // Update the row styling
+                    const row = document.querySelector(`tr[data-order-id="${orderId}"]`);
+                    if (row) {
+                        row.dataset.status = newStatus;
+                    }
+                } else {
+                    showToast('❌ Failed to update order status');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('❌ Error updating order status');
+            });
+        }
+    }
+
+    // Filter orders
+    function filterOrders(status) {
+        const rows = document.querySelectorAll('.order-row');
+        rows.forEach(row => {
+            if (status === 'all' || row.dataset.status === status) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // View order details
+    function viewOrderDetails(orderId) {
+        window.location.href = `/admin/orders/${orderId}`;
+    }
+
+    // Edit order
+    function editOrder(orderId) {
+        window.location.href = `/admin/orders/${orderId}/edit`;
+    }
+
+    function refreshData() {
+        location.reload();
+    }
+
+    // Show toast notification
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.textContent = message;
+        toast.style.cssText = `
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: rgba(139, 69, 19, 0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    // Auto-refresh for real-time updates
+    setInterval(() => {
+        // Only refresh if there are pending orders
+        const pendingOrders = document.querySelectorAll('[data-status="pending"], [data-status="confirmed"], [data-status="preparing"]');
+        if (pendingOrders.length > 0) {
+            // In a real app, you'd fetch only the updated data
+            console.log('Auto-refreshing order data...');
+        }
+    }, 30000); // Every 30 seconds
+
+
+
+    // Custom styles
+    const style = document.createElement('style');
+    style.textContent = `
+        /* Admin Dashboard Styles */
+        .admin-stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .admin-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+            opacity: 0.8;
+        }
+
+        .stat-content h4 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-content p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .admin-content-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            height: 450px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .card-header h5 {
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .card-body {
+            padding: 20px;
+            height: calc(100% - 70px);
+            overflow-y: auto;
+        }
+
+        .admin-sidebar-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .admin-sidebar-card h6 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            background: rgba(139, 69, 19, 0.2);
+            border: 1px solid rgba(139, 69, 19, 0.3);
+            border-radius: 8px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: rgba(139, 69, 19, 0.3);
+            color: var(--text-primary);
+            transform: translateX(3px);
+        }
+
+        .summary-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+
+        .summary-row span {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .summary-row strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - Afforgato Cafe Admin ☕{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0 admin-title">
+                    <span class="admin-icon">👥</span>
+                    User Management
+                </h1>
+                <div class="admin-actions">
+                    <a href="{{ url_for('admin_dashboard') }}" class="glass-btn-secondary me-2">
+                        ← Back to Dashboard
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="glass-card p-3 text-center stats-card">
+                <div class="stats-icon">👥</div>
+                <h4>{{ users|length }}</h4>
+                <p class="mb-0">Total Users</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card p-3 text-center stats-card">
+                <div class="stats-icon">👨‍💼</div>
+                <h4>{{ users|selectattr('is_admin')|list|length }}</h4>
+                <p class="mb-0">Admins</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card p-3 text-center stats-card">
+                <div class="stats-icon">👤</div>
+                <h4>{{ users|rejectattr('is_admin')|list|length }}</h4>
+                <p class="mb-0">Customers</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="glass-card p-3 text-center stats-card">
+                <div class="stats-icon">📅</div>
+                <h4>{{ users|selectattr('created_at')|list|length }}</h4>
+                <p class="mb-0">Active Today</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="mb-0">All Users</h5>
+                    <div class="table-controls">
+                        <input type="text" class="form-control glass-input" placeholder="🔍 Search users..." id="userSearch" style="width: 250px;">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover admin-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Role</th>
+                                <th>Joined</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr class="user-row" data-user-id="{{ user.id }}">
+                                <td><strong>#{{ user.id }}</strong></td>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="user-name">{{ user.full_name }}</div>
+                                        {% if user.is_admin %}
+                                            <span class="badge bg-warning">👨‍💼 Admin</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.phone or 'Not provided' }}</td>
+                                <td>
+                                    {% if user.is_admin %}
+                                        <span class="role-badge admin">👨‍💼 Admin</span>
+                                    {% else %}
+                                        <span class="role-badge customer">👤 Customer</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.created_at.strftime('%m/%d/%Y') }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-info btn-sm" onclick="viewUser({{ user.id }})">
+                                            👁️ View
+                                        </button>
+                                        {% if user.id != current_user.id %}
+                                            <button class="btn btn-outline-warning btn-sm" onclick="editUser({{ user.id }})">
+                                                ✏️ Edit
+                                            </button>
+                                            {% if not user.is_admin %}
+                                                <button class="btn btn-outline-success btn-sm" onclick="makeAdmin({{ user.id }})">
+                                                    ⬆️ Make Admin
+                                                </button>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content glass-card border-0">
+            <div class="modal-header border-bottom border-secondary">
+                <h5 class="modal-title">👤 User Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="userModalContent">
+                <!-- User details will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Search functionality
+    document.getElementById('userSearch').addEventListener('input', function() {
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.user-row');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            if (text.includes(query)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // View user details
+    function viewUser(userId) {
+        window.location.href = `/admin/users/${userId}`;
+    }
+
+    // Edit user
+    function editUser(userId) {
+        window.location.href = `/admin/users/${userId}/edit`;
+    }
+
+    // Make admin
+    function makeAdmin(userId) {
+        if (confirm('👨‍💼 Are you sure you want to make this user an admin?')) {
+            fetch(`/admin/users/${userId}/toggle_admin`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred');
+            });
+        }
+    }
+
+
+
+    // Add custom styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .admin-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .admin-icon {
+            font-size: 2.5rem;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .stats-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stats-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .admin-table {
+            color: var(--text-primary);
+        }
+        
+        .admin-table th {
+            background: var(--accent-bg);
+            color: var(--text-primary);
+            border: none;
+            font-weight: 600;
+        }
+        
+        .admin-table td {
+            border-color: var(--glass-border);
+            vertical-align: middle;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .user-name {
+            font-weight: 600;
+        }
+        
+        .role-badge {
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .role-badge.admin {
+            background: var(--caramel);
+            color: var(--text-primary);
+        }
+        
+        .role-badge.customer {
+            background: var(--glass-bg);
+            color: var(--text-secondary);
+        }
+        
+        .table-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Add Menu Item - Afforgato Cafe Admin ☕{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0 admin-title">
+                    <span class="admin-icon">➕</span>
+                    Add New Menu Item
+                </h1>
+                <a href="{{ url_for('admin_menu') }}" class="glass-btn-secondary">
+                    ← Back to Menu
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="glass-card p-5">
+                <form method="POST" id="addItemForm">
+                    <div class="row">
+                        <!-- Item Name -->
+                        <div class="col-md-6 mb-3">
+                            <label for="name" class="form-label">
+                                🏷️ Item Name
+                            </label>
+                            <input type="text" 
+                                   class="form-control glass-input" 
+                                   id="name" 
+                                   name="name" 
+                                   placeholder="e.g., Caramel Macchiato"
+                                   required>
+                        </div>
+
+                        <!-- Emoji -->
+                        <div class="col-md-6 mb-3">
+                            <label for="emoji" class="form-label">
+                                😊 Emoji
+                            </label>
+                            <input type="text" 
+                                   class="form-control glass-input" 
+                                   id="emoji" 
+                                   name="emoji" 
+                                   placeholder="☕"
+                                   maxlength="2">
+                            <div class="form-text">Choose an emoji to represent this item</div>
+                        </div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">
+                            📝 Description
+                        </label>
+                        <textarea class="form-control glass-input" 
+                                  id="description" 
+                                  name="description" 
+                                  rows="3" 
+                                  placeholder="Describe this delicious item..."></textarea>
+                    </div>
+
+                    <div class="row">
+                        <!-- Price -->
+                        <div class="col-md-6 mb-3">
+                            <label for="price" class="form-label">
+                                💰 Price ($)
+                            </label>
+                            <input type="number" 
+                                   class="form-control glass-input" 
+                                   id="price" 
+                                   name="price" 
+                                   step="0.01" 
+                                   min="0" 
+                                   placeholder="4.99"
+                                   required>
+                        </div>
+
+                        <!-- Category -->
+                        <div class="col-md-6 mb-3">
+                            <label for="category_id" class="form-label">
+                                📂 Category
+                            </label>
+                            <select class="form-select glass-input" id="category_id" name="category_id" required>
+                                <option value="">Select a category</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.emoji }} {{ category.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Preview Card -->
+                    <div class="mb-4">
+                        <label class="form-label">👁️ Preview</label>
+                        <div class="preview-card glass-card p-3">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <div class="preview-emoji">☕</div>
+                                </div>
+                                <div class="col">
+                                    <h6 class="preview-name mb-1">Item Name</h6>
+                                    <p class="preview-description mb-1 text-muted">Item description will appear here...</p>
+                                    <span class="preview-price">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('admin_menu') }}" class="glass-btn-secondary me-md-2">
+                            ❌ Cancel
+                        </a>
+                        <button type="submit" class="glass-btn">
+                            ✅ Add Item
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Live preview update
+    function updatePreview() {
+        const name = document.getElementById('name').value || 'Item Name';
+        const emoji = document.getElementById('emoji').value || '☕';
+        const description = document.getElementById('description').value || 'Item description will appear here...';
+        const price = document.getElementById('price').value || '0.00';
+
+        document.querySelector('.preview-emoji').textContent = emoji;
+        document.querySelector('.preview-name').textContent = name;
+        document.querySelector('.preview-description').textContent = description;
+        document.querySelector('.preview-price').textContent = `$${parseFloat(price).toFixed(2)}`;
+    }
+
+    // Add event listeners for live preview
+    ['name', 'emoji', 'description', 'price'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updatePreview);
+    });
+
+
+
+    // Form validation
+    document.getElementById('addItemForm').addEventListener('submit', function(e) {
+        const name = document.getElementById('name').value.trim();
+        const price = parseFloat(document.getElementById('price').value);
+        const categoryId = document.getElementById('category_id').value;
+
+        if (!name) {
+            e.preventDefault();
+            alert('❌ Please enter an item name');
+            return;
+        }
+
+        if (!price || price <= 0) {
+            e.preventDefault();
+            alert('❌ Please enter a valid price');
+            return;
+        }
+
+        if (!categoryId) {
+            e.preventDefault();
+            alert('❌ Please select a category');
+            return;
+        }
+
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.innerHTML = '⏳ Adding Item...';
+        submitBtn.disabled = true;
+    });
+
+    // Add custom styles
+    const style = document.createElement('style');
+    style.textContent = `
+        .preview-card {
+            background: var(--accent-bg);
+            border: 2px dashed var(--caramel);
+        }
+        
+        .preview-emoji {
+            font-size: 2.5rem;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--glass-bg);
+            border-radius: 15px;
+        }
+        
+        .preview-name {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .preview-description {
+            font-size: 0.9rem;
+        }
+        
+        .preview-price {
+            background: var(--caramel);
+            color: var(--text-primary);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-weight: 700;
+        }
+        
+
+        
+        .form-text {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Initialize preview
+    updatePreview();
+</script>
+{% endblock %}

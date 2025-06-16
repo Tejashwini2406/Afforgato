@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block title %}Edit User - {{ user.full_name }} - Afforgato Cafe Admin ☕{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="mb-0 admin-title">
+                    <span class="admin-icon">✏️</span>
+                    Edit User - {{ user.full_name }}
+                </h1>
+                <div class="admin-actions">
+                    <a href="{{ url_for('admin_view_user', user_id=user.id) }}" class="glass-btn-secondary me-2">
+                        ← Back to User
+                    </a>
+                    <a href="{{ url_for('admin_users') }}" class="glass-btn-secondary">
+                        👥 All Users
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="glass-card">
+                <h5 class="card-title">👤 User Information</h5>
+                
+                <form method="POST" class="admin-form">
+                    <div class="row g-4">
+                        <!-- Basic Information -->
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">First Name</label>
+                                <input type="text" class="glass-input" name="first_name" 
+                                       value="{{ user.first_name }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Last Name</label>
+                                <input type="text" class="glass-input" name="last_name" 
+                                       value="{{ user.last_name }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="glass-input" value="{{ user.username }}" 
+                                       readonly disabled>
+                                <small class="form-text text-muted">Username cannot be changed</small>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="glass-input" name="email" 
+                                       value="{{ user.email }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="glass-input" name="phone" 
+                                       value="{{ user.phone or '' }}" 
+                                       placeholder="+91 98765 43210">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="form-label">User ID</label>
+                                <input type="text" class="glass-input" value="#{{ user.id }}" 
+                                       readonly disabled>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label class="form-label">Address</label>
+                                <textarea class="glass-input" name="address" rows="3" 
+                                          placeholder="Enter complete address">{{ user.address or '' }}</textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Admin Status -->
+                        {% if user.id != current_user.id %}
+                        <div class="col-12">
+                            <div class="form-group">
+                                <div class="admin-status-section">
+                                    <h6 class="mb-3">👨‍💼 Admin Privileges</h6>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="is_admin" id="is_admin" 
+                                               {{ 'checked' if user.is_admin else '' }}>
+                                        <label class="form-check-label" for="is_admin">
+                                            Grant admin privileges to this user
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Admin users can manage menu items, orders, and other users.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Account Information -->
+                        <div class="col-12">
+                            <div class="account-info-section">
+                                <h6 class="mb-3">📊 Account Information</h6>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="info-card">
+                                            <div class="info-label">Member Since</div>
+                                            <div class="info-value">{{ user.created_at.strftime('%B %d, %Y') }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="info-card">
+                                            <div class="info-label">Account Status</div>
+                                            <div class="info-value">
+                                                {% if user.is_admin %}
+                                                    <span class="badge bg-warning">👨‍💼 Admin</span>
+                                                {% else %}
+                                                    <span class="badge bg-primary">👤 Customer</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="info-card">
+                                            <div class="info-label">Last Updated</div>
+                                            <div class="info-value">{{ user.created_at.strftime('%m/%d/%Y') }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Actions -->
+                    <div class="form-actions mt-4">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="{{ url_for('admin_view_user', user_id=user.id) }}" 
+                                   class="glass-btn-secondary">
+                                    ← Cancel
+                                </a>
+                            </div>
+                            <div>
+                                <button type="submit" class="glass-btn">
+                                    💾 Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    .admin-form .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .admin-form .form-label {
+        font-weight: 600;
+        color: var(--brown-primary);
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .admin-form .glass-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid rgba(139, 69, 19, 0.3);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        transition: all 0.3s ease;
+    }
+    
+    .admin-form .glass-input:focus {
+        border-color: var(--brown-primary);
+        box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25);
+        outline: none;
+    }
+    
+    .admin-form .glass-input:disabled {
+        background: rgba(248, 249, 250, 0.8);
+        color: #6c757d;
+    }
+    
+    .admin-status-section {
+        background: rgba(139, 69, 19, 0.05);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(139, 69, 19, 0.1);
+    }
+    
+    .form-check-input:checked {
+        background-color: var(--brown-primary);
+        border-color: var(--brown-primary);
+    }
+    
+    .account-info-section {
+        background: rgba(248, 249, 250, 0.8);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid rgba(139, 69, 19, 0.1);
+    }
+    
+    .info-card {
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        text-align: center;
+        border: 1px solid rgba(139, 69, 19, 0.1);
+    }
+    
+    .info-label {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    
+    .info-value {
+        font-weight: 600;
+        color: var(--brown-primary);
+    }
+    
+    .form-actions {
+        border-top: 1px solid rgba(139, 69, 19, 0.1);
+        padding-top: 20px;
+    }
+    
+    .form-text {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .admin-form .row.g-4 {
+            gap: 1rem;
+        }
+        
+        .form-actions .d-flex {
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .form-actions .glass-btn,
+        .form-actions .glass-btn-secondary {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const firstName = document.querySelector('input[name="first_name"]').value.trim();
+        const lastName = document.querySelector('input[name="last_name"]').value.trim();
+        const email = document.querySelector('input[name="email"]').value.trim();
+        
+        if (!firstName || !lastName || !email) {
+            e.preventDefault();
+            alert('Please fill in all required fields (First Name, Last Name, Email)');
+            return;
+        }
+        
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            e.preventDefault();
+            alert('Please enter a valid email address');
+            return;
+        }
+        
+        // Phone validation (if provided)
+        const phone = document.querySelector('input[name="phone"]').value.trim();
+        if (phone && !/^[\+]?[0-9\s\-\(\)]{10,}$/.test(phone)) {
+            e.preventDefault();
+            alert('Please enter a valid phone number');
+            return;
+        }
+    });
+    
+    // Admin status change warning
+    const adminCheckbox = document.getElementById('is_admin');
+    if (adminCheckbox) {
+        adminCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                if (!confirm('Are you sure you want to grant admin privileges to this user? Admins can manage all aspects of the system.')) {
+                    this.checked = false;
+                }
+            } else {
+                if (!confirm('Are you sure you want to remove admin privileges from this user?')) {
+                    this.checked = true;
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

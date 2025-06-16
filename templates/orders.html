@@ -1,0 +1,716 @@
+{% extends "base.html" %}
+
+{% block title %}My Orders - Afforgato Cafe ☕{% endblock %}
+
+{% block content %}
+<div class="orders-page">
+    <div class="container-fluid">
+        <!-- Header Section -->
+        <div class="orders-header">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="orders-title">
+                        <span class="orders-icon">📦</span>
+                        My Orders
+                    </h1>
+                    <p class="orders-subtitle">Track and manage your coffee orders</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="{{ url_for('menu') }}" class="glass-btn">
+                        <i class="fas fa-coffee me-2"></i>Order Again
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if orders %}
+        <!-- Orders List -->
+        <div class="orders-container">
+            {% for order in orders %}
+            <div class="order-card">
+                <!-- Order Header -->
+                <div class="order-header">
+                    <div class="row align-items-center">
+                        <div class="col-lg-3 col-md-6">
+                            <div class="order-info">
+                                <h4 class="order-number">Order #{{ order.order_number or order.id }}</h4>
+                                <p class="order-date">{{ order.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <div class="order-status-container">
+                                <span class="status-badge status-{{ order.status }}">
+                                    {% if order.status == 'pending' %}⏳ Pending
+                                    {% elif order.status == 'confirmed' %}✅ Confirmed
+                                    {% elif order.status == 'preparing' %}👨‍🍳 Preparing
+                                    {% elif order.status == 'ready' %}🔔 Ready
+                                    {% elif order.status == 'delivered' %}📦 Delivered
+                                    {% elif order.status == 'cancelled' %}❌ Cancelled
+                                    {% else %}{{ order.status.title() }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <div class="payment-status-container">
+                                <label class="status-label">Payment</label>
+                                <span class="payment-badge payment-{{ order.payment_status }}">
+                                    {% if order.payment_status == 'paid' %}💳 Paid
+                                    {% elif order.payment_status == 'failed' %}❌ Failed
+                                    {% else %}⏳ Pending
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-lg-2 col-md-6">
+                            <div class="payment-method-container">
+                                <label class="status-label">Method</label>
+                                <p class="payment-method">{{ order.payment_method.replace('_', ' ').title() if order.payment_method else 'N/A' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 text-lg-end">
+                            <div class="order-total">
+                                <h3 class="total-amount">₹{{ "%.0f"|format(order.total_amount) }}</h3>
+                                <p class="total-label">Total Amount</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Body -->
+                <div class="order-body">
+                    <!-- Order Items -->
+                    <div class="order-items-section">
+                        <h5 class="section-title">
+                            <span class="section-icon">🍽️</span>
+                            Items Ordered
+                        </h5>
+                        <div class="items-grid">
+                            {% for item in order.order_items %}
+                            <div class="order-item-card">
+                                <div class="item-content">
+                                    <div class="item-emoji">{{ item.menu_item.emoji or '☕' }}</div>
+                                    <div class="item-details">
+                                        <h6 class="item-name">{{ item.menu_item.name }}</h6>
+                                        <p class="item-quantity">Qty: {{ item.quantity }} × ₹{{ "%.0f"|format(item.price) }}</p>
+                                        {% if item.notes %}
+                                        <p class="item-notes">📝 {{ item.notes }}</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="item-price">
+                                        <span class="price-amount">₹{{ "%.0f"|format(item.subtotal) }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    {% if order.notes %}
+                    <div class="order-notes mb-3">
+                        <h6 class="mb-2">📝 Order Notes:</h6>
+                        <div class="glass-card p-3">
+                            <small>{{ order.notes }}</small>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Order Actions -->
+                    <div class="order-actions d-flex flex-wrap gap-2">
+                        <a href="{{ url_for('menu') }}" class="glass-btn-secondary btn-sm">
+                            ☕ Order Again
+                        </a>
+                    </div>
+
+                    <!-- Order Timeline -->
+                    <div class="order-timeline mt-4">
+                        <h6 class="mb-3">📅 Order Timeline:</h6>
+                        <div class="timeline">
+                            <div class="timeline-item active">
+                                <div class="timeline-marker">✅</div>
+                                <div class="timeline-content">
+                                    <strong>Order Placed</strong>
+                                    <small class="d-block text-muted">{{ order.created_at.strftime('%I:%M %p') }}</small>
+                                </div>
+                            </div>
+                            
+                            {% if order.status in ['confirmed', 'preparing', 'ready', 'delivered'] %}
+                            <div class="timeline-item active">
+                                <div class="timeline-marker">✅</div>
+                                <div class="timeline-content">
+                                    <strong>Order Confirmed</strong>
+                                    <small class="d-block text-muted">{{ order.created_at.strftime('%I:%M %p') }}</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if order.status in ['preparing', 'ready', 'delivered'] %}
+                            <div class="timeline-item active">
+                                <div class="timeline-marker">👨‍🍳</div>
+                                <div class="timeline-content">
+                                    <strong>Preparing</strong>
+                                    <small class="d-block text-muted">Preparing...</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if order.status in ['ready', 'delivered'] %}
+                            <div class="timeline-item active">
+                                <div class="timeline-marker">🔔</div>
+                                <div class="timeline-content">
+                                    <strong>Ready for Pickup/Delivery</strong>
+                                    <small class="d-block text-muted">Ready!</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if order.status == 'delivered' %}
+                            <div class="timeline-item active">
+                                <div class="timeline-marker">📦</div>
+                                <div class="timeline-content">
+                                    <strong>Delivered</strong>
+                                    <small class="d-block text-muted">Delivered!</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            {% if order.status not in ['delivered', 'cancelled'] %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker">⏳</div>
+                                <div class="timeline-content">
+                                    <strong>
+                                        {% if order.status == 'pending' %}Awaiting Confirmation{% endif %}
+                                        {% if order.status == 'confirmed' %}Starting Preparation{% endif %}
+                                        {% if order.status == 'preparing' %}Almost Ready{% endif %}
+                                        {% if order.status == 'ready' %}Out for Delivery{% endif %}
+                                    </strong>
+                                    <small class="d-block text-muted">Estimated: 
+                                        {% if order.status == 'pending' %}2 minutes{% endif %}
+                                        {% if order.status == 'confirmed' %}5 minutes{% endif %}
+                                        {% if order.status == 'preparing' %}10 minutes{% endif %}
+                                        {% if order.status == 'ready' %}5 minutes{% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination (if needed) -->
+    <div class="row mt-4">
+        <div class="col-12 text-center">
+            <div class="glass-card p-3">
+                <small class="text-muted">Showing {{ orders|length }} order(s)</small>
+            </div>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- No Orders -->
+    <div class="row">
+        <div class="col-12">
+            <div class="glass-card text-center">
+                <div class="empty-orders-icon mb-4">
+                    <i class="fas fa-receipt fa-4x text-muted"></i>
+                </div>
+                <h3 class="mb-3">No orders yet! 📦</h3>
+                <p class="lead mb-4">You haven't placed any orders with us yet. Ready to try our delicious coffee?</p>
+                <a href="{{ url_for('menu') }}" class="glass-btn">
+                    ☕ Browse Menu
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+
+    // Auto-refresh for pending orders
+    function autoRefresh() {
+        const pendingOrders = document.querySelectorAll('.status-pending, .status-confirmed, .status-preparing');
+        if (pendingOrders.length > 0) {
+            setTimeout(() => {
+                location.reload();
+            }, 30000); // Refresh every 30 seconds
+        }
+    }
+
+    // Initialize auto-refresh
+    autoRefresh();
+
+    // Smooth animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+    });
+
+    // Custom styles
+    const style = document.createElement('style');
+    style.textContent = `
+        /* Professional Orders Page Styles */
+        .orders-page {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: calc(100vh - 200px);
+            padding: 1rem 0 3rem 0;
+        }
+
+        .container-fluid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* Header Styles */
+        .orders-header {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border: 1px solid rgba(139, 69, 19, 0.1);
+        }
+
+        .orders-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--brown-primary);
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .orders-icon {
+            font-size: 1.8rem;
+        }
+
+        .orders-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        /* Orders Container */
+        .orders-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        /* Order Card */
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border: 1px solid rgba(139, 69, 19, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Order Header */
+        .order-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 1.25rem;
+            border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+        }
+
+        .order-info h4 {
+            color: var(--brown-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .order-date {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        .status-label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-align: center;
+        }
+
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-confirmed { background: #d1ecf1; color: #0c5460; }
+        .status-preparing { background: #f8d7da; color: #721c24; }
+        .status-ready { background: #d4edda; color: #155724; }
+        .status-delivered { background: #d1ecf1; color: #0c5460; }
+        .status-cancelled { background: #f8d7da; color: #721c24; }
+
+        .payment-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .payment-paid { background: #d4edda; color: #155724; }
+        .payment-failed { background: #f8d7da; color: #721c24; }
+        .payment-pending { background: #fff3cd; color: #856404; }
+
+        .payment-method {
+            color: var(--text-primary);
+            font-weight: 500;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .order-total {
+            text-align: right;
+        }
+
+        .total-amount {
+            color: var(--brown-primary);
+            font-weight: 700;
+            font-size: 2rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .total-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        /* Order Body */
+        .order-body {
+            padding: 1.25rem;
+        }
+
+        .section-title {
+            color: var(--brown-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-icon {
+            font-size: 1.1rem;
+        }
+
+        /* Order Items Grid */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .order-item-card {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .order-item-card:hover {
+            background: white;
+            border-color: var(--brown-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.1);
+        }
+
+        .item-content {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .item-emoji {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--brown-primary), var(--brown-secondary));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item-details {
+            flex-grow: 1;
+        }
+
+        .item-name {
+            color: var(--brown-primary);
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-quantity {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .item-notes {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-style: italic;
+            margin: 0;
+        }
+
+        .item-price {
+            text-align: right;
+        }
+
+        .price-amount {
+            color: var(--brown-primary);
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        /* Action Buttons */
+        .order-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(139, 69, 19, 0.1);
+        }
+
+        .glass-btn, .glass-btn-secondary {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .glass-btn {
+            background: var(--brown-primary);
+            color: white;
+        }
+
+        .glass-btn:hover {
+            background: var(--brown-secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+        }
+
+        .glass-btn-secondary {
+            background: transparent;
+            color: var(--brown-primary);
+            border: 2px solid var(--brown-primary);
+        }
+
+        .glass-btn-secondary:hover {
+            background: var(--brown-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+            margin-top: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: linear-gradient(to bottom, var(--brown-primary), rgba(139, 69, 19, 0.3));
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item.active {
+            opacity: 1;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -32px;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            background: white;
+            border: 3px solid rgba(139, 69, 19, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .timeline-item.active .timeline-marker {
+            background: var(--brown-primary);
+            border-color: var(--brown-primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .timeline-content {
+            padding-left: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .timeline-content strong {
+            color: var(--brown-primary);
+            font-size: 1.1rem;
+        }
+
+        /* Empty State */
+        .empty-orders {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        .empty-orders-icon {
+            font-size: 4rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container-fluid {
+                padding: 0 1rem;
+            }
+
+            .orders-title {
+                font-size: 2rem;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .orders-header {
+                padding: 1.5rem;
+                text-align: center;
+            }
+
+            .orders-title {
+                font-size: 1.75rem;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .order-header {
+                padding: 1.5rem;
+            }
+
+            .order-body {
+                padding: 1.5rem;
+            }
+
+            .order-total {
+                text-align: left;
+                margin-top: 1rem;
+            }
+
+            .total-amount {
+                font-size: 1.5rem;
+            }
+
+            .item-emoji {
+                width: 50px;
+                height: 50px;
+                font-size: 2rem;
+            }
+
+            .timeline {
+                padding-left: 30px;
+            }
+
+            .timeline-marker {
+                left: -25px;
+                width: 30px;
+                height: 30px;
+                font-size: 0.8rem;
+            }
+
+            .order-actions {
+                flex-direction: column;
+            }
+
+            .glass-btn, .glass-btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

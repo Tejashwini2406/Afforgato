@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Registration Successful - Afforgato Cafe{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="container">
+        <div class="content-wrapper">
+            <div class="glass-card p-5 text-center">
+                <div class="success-animation mb-4">
+                    <div class="success-icon">
+                        ✅
+                    </div>
+                </div>
+                
+                <h1 class="mb-4 text-success">Registration Successful!</h1>
+                
+                <div class="welcome-message mb-4">
+                    <h3 class="mb-3">Welcome to Afforgato Cafe, {{ current_user.first_name }}! 🎉</h3>
+                    <p class="lead mb-4">
+                        Your account has been successfully created. You're now part of the Afforgato family!
+                    </p>
+                </div>
+
+                <div class="user-details glass-card p-4 mb-4">
+                    <h5 class="mb-3">Your Account Details:</h5>
+                    <div class="row text-start">
+                        <div class="col-md-6">
+                            <p><strong>👤 Name:</strong> {{ current_user.first_name }} {{ current_user.last_name }}</p>
+                            <p><strong>🏷️ Username:</strong> {{ current_user.username }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>📧 Email:</strong> {{ current_user.email }}</p>
+                            {% if current_user.phone %}
+                            <p><strong>📱 Phone:</strong> {{ current_user.phone }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="next-steps mb-4">
+                    <h5 class="mb-3">What's Next?</h5>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="glass-card p-3">
+                                <div class="step-icon mb-2">🍽️</div>
+                                <h6>Explore Menu</h6>
+                                <small>Browse our delicious coffee and food items</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="glass-card p-3">
+                                <div class="step-icon mb-2">🛒</div>
+                                <h6>Place Order</h6>
+                                <small>Add items to cart and place your first order</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="glass-card p-3">
+                                <div class="step-icon mb-2">📦</div>
+                                <h6>Track Orders</h6>
+                                <small>Monitor your order status in real-time</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="{{ url_for('menu') }}" class="glass-btn me-3">
+                        🍽️ Explore Menu
+                    </a>
+                    <a href="{{ url_for('index') }}" class="glass-btn-secondary">
+                        🏠 Go to Home
+                    </a>
+                </div>
+
+                <div class="cafe-info mt-4 p-3 glass-card">
+                    <h6 class="mb-2">📍 Visit Us</h6>
+                    <p class="mb-1"><strong>Afforgato Cafe</strong></p>
+                    <p class="mb-1">Bengaluru, Karnataka, India</p>
+                    <p class="mb-1">📞 +91 98765 43210</p>
+                    <p class="mb-0"><small>Owned by Tejashwini</small></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<style>
+    .success-animation {
+        animation: bounceIn 1s ease-out;
+    }
+    
+    .success-icon {
+        font-size: 4rem;
+        animation: pulse 2s infinite;
+    }
+    
+    .step-icon {
+        font-size: 2rem;
+    }
+    
+    .user-details {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(184, 134, 11, 0.2);
+    }
+    
+    .cafe-info {
+        background: rgba(248, 249, 250, 0.9);
+        border: 1px solid rgba(184, 134, 11, 0.1);
+    }
+    
+    @keyframes bounceIn {
+        0% {
+            transform: scale(0.3);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.05);
+        }
+        70% {
+            transform: scale(0.9);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+        }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.8s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<script>
+    // Add fade-in animation to elements
+    document.addEventListener('DOMContentLoaded', function() {
+        const elements = document.querySelectorAll('.next-steps .glass-card, .action-buttons, .cafe-info');
+        elements.forEach((el, index) => {
+            setTimeout(() => {
+                el.classList.add('fade-in');
+            }, 500 + (index * 200));
+        });
+    });
+    
+    // Auto-redirect to menu after 10 seconds (optional)
+    setTimeout(() => {
+        const redirectBtn = document.querySelector('a[href*="menu"]');
+        if (redirectBtn) {
+            redirectBtn.style.animation = 'pulse 1s infinite';
+            redirectBtn.innerHTML = '🍽️ Explore Menu (Auto-redirecting...)';
+        }
+    }, 8000);
+    
+    // Uncomment below to enable auto-redirect
+    // setTimeout(() => {
+    //     window.location.href = "{{ url_for('menu') }}";
+    // }, 10000);
+</script>
+{% endblock %}

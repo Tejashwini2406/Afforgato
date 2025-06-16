@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Afforgato Cafe ☕{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="container">
+        <div class="form-container">
+            <div class="glass-form">
+                <div class="text-center mb-4">
+                    <h2 class="mb-3">Join Afforgato! 🎉</h2>
+                    <p class="text-muted">Create your account and start your coffee journey</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('register') }}" id="registerForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="first_name" class="form-label">
+                                👤 First Name
+                            </label>
+                            <input type="text" 
+                                   class="form-control glass-input" 
+                                   id="first_name" 
+                                   name="first_name" 
+                                   placeholder="Your first name"
+                                   required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="last_name" class="form-label">
+                                👤 Last Name
+                            </label>
+                            <input type="text" 
+                                   class="form-control glass-input" 
+                                   id="last_name" 
+                                   name="last_name" 
+                                   placeholder="Your last name"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">
+                            🏷️ Username
+                        </label>
+                        <input type="text" 
+                               class="form-control glass-input" 
+                               id="username" 
+                               name="username" 
+                               placeholder="Choose a unique username"
+                               required>
+                        <div class="form-text text-muted">
+                            This will be your unique identifier
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="email" class="form-label">
+                            📧 Email Address
+                        </label>
+                        <input type="email" 
+                               class="form-control glass-input" 
+                               id="email" 
+                               name="email" 
+                               placeholder="your.email@example.com"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">
+                            🔒 Password
+                        </label>
+                        <input type="password" 
+                               class="form-control glass-input" 
+                               id="password" 
+                               name="password" 
+                               placeholder="Create a strong password"
+                               required>
+                        <div class="password-strength mt-1">
+                            <div class="progress" style="height: 4px;">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <small class="form-text text-muted">Password strength: <span id="strength-text">Weak</span></small>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">
+                            📱 Phone Number <span class="text-muted">(Optional)</span>
+                        </label>
+                        <input type="tel"
+                               class="form-control glass-input"
+                               id="phone"
+                               name="phone"
+                               placeholder="+91 98765 43210">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="address" class="form-label">
+                            🏠 Address <span class="text-muted">(Optional)</span>
+                        </label>
+                        <textarea class="form-control glass-input" 
+                                  id="address" 
+                                  name="address" 
+                                  rows="2" 
+                                  placeholder="Your delivery address"></textarea>
+                    </div>
+
+
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="glass-btn">
+                            🚀 Create Account
+                        </button>
+                    </div>
+
+                    <div class="text-center">
+                        <p class="mb-0">
+                            Already have an account? 
+                            <a href="{{ url_for('login') }}" class="text-brown text-decoration-none fw-bold">
+                                🔑 Sign in here
+                            </a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Password strength checker
+    const passwordInput = document.getElementById('password');
+    const progressBar = document.querySelector('.progress-bar');
+    const strengthText = document.getElementById('strength-text');
+
+    passwordInput.addEventListener('input', function() {
+        const password = this.value;
+        const strength = calculatePasswordStrength(password);
+        
+        updatePasswordStrength(strength);
+    });
+
+    function calculatePasswordStrength(password) {
+        let score = 0;
+        
+        if (password.length >= 8) score += 25;
+        if (password.match(/[a-z]/)) score += 25;
+        if (password.match(/[A-Z]/)) score += 25;
+        if (password.match(/[0-9]/)) score += 25;
+        if (password.match(/[^a-zA-Z0-9]/)) score += 25;
+        
+        return Math.min(score, 100);
+    }
+
+    function updatePasswordStrength(strength) {
+        progressBar.style.width = strength + '%';
+        
+        if (strength < 50) {
+            progressBar.className = 'progress-bar bg-danger';
+            strengthText.textContent = 'Weak';
+        } else if (strength < 75) {
+            progressBar.className = 'progress-bar bg-warning';
+            strengthText.textContent = 'Medium';
+        } else {
+            progressBar.className = 'progress-bar bg-success';
+            strengthText.textContent = 'Strong';
+        }
+    }
+
+    // Simplified form handling
+    const form = document.getElementById('registerForm');
+    console.log('Form found:', form);
+
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            console.log('Form submitted!');
+            const submitBtn = this.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.innerHTML = '⏳ Creating Account...';
+                submitBtn.disabled = true;
+            }
+            // Let form submit normally
+        });
+    }
+
+    // Simple form debugging
+    console.log('Registration form JavaScript loaded');
+
+    // Add click handler to submit button for debugging
+    const submitBtn = document.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function(e) {
+            console.log('Submit button clicked');
+        });
+    }
+</script>
+{% endblock %}
